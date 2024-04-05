@@ -5,8 +5,7 @@ import lightgbm as lgb
 from sklearn.model_selection import train_test_split
 
 
-def gettraindata():
-
+def gettraindata(feature):
     DATA_ROOT_DEFOG = r'../DATA/train/defog/'
     defog = pd.DataFrame()
     for root, dirs, files in os.walk(DATA_ROOT_DEFOG):
@@ -22,23 +21,22 @@ def gettraindata():
     # print(defog)
 
     defog['IsFOG'] = defog[['StartHesitation', 'Walking', 'Turn']].any(axis='columns')
-    print('\n', defog[['Time', 'StartHesitation', 'Walking', 'Turn', 'IsFOG']][1047890:1071070])
+    # print('\n', defog[['Time', 'StartHesitation', 'Walking', 'Turn', 'IsFOG']][1047890:1071070])
 
-    print(len(defog['IsFOG'][defog['IsFOG'] == 0])+len(defog['IsFOG'][defog['IsFOG'] == 1]))
-
+    # print(len(defog['IsFOG'][defog['IsFOG'] == 0]) + len(defog['IsFOG'][defog['IsFOG'] == 1]))
 
     subj_start = (defog['Time'][defog['Time'] == 0])
     subj_start_ind = np.array(subj_start.index)
-    print(len(subj_start_ind))
+    # print(len(subj_start_ind))
 
     subj_end_ind = subj_start_ind[1:] - 1
-    print(len(subj_end_ind))
+    # print(len(subj_end_ind))
 
-    print('FOG event at head of subject number: ', np.where(defog['IsFOG'][subj_start_ind] == 1))
+    # print('FOG event at head of subject number: ', np.where(defog['IsFOG'][subj_start_ind] == 1))
 
-    print('FOG event at tail of subject number: ', np.where(defog['IsFOG'][subj_end_ind] == 1))
+    # print('FOG event at tail of subject number: ', np.where(defog['IsFOG'][subj_end_ind] == 1))
 
-    x = defog[['AccV', 'AccML', 'AccAP']]
+    x = defog[feature]
     y = defog['IsFOG']
 
     X_train, X_test, Y_train, Y_test_defog = train_test_split(x, y, test_size=0.1, random_state=1)
@@ -59,4 +57,3 @@ def gettraindata():
     }
 
     return x_train, x_val, y_train, y_val
-

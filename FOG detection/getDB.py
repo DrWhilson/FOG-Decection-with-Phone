@@ -6,6 +6,7 @@ from scipy import signal
 
 import os
 
+
 def gettraindata(targets):
     # Folder path
     path = r'..\DATA'
@@ -74,6 +75,7 @@ def gettraindata(targets):
     #     plt.show()
     #     break
 
-    all_features = [feature for feature in all_train_data.columns if feature !='Id' and feature not in targets and feature != 'Time']
+    all_features = [feature for feature in all_train_data.columns if
+                    feature != 'Id' and feature not in targets and feature != 'Time']
 
     return all_features, all_train_data
