@@ -7,22 +7,8 @@ from scipy import signal
 import os
 
 
-def gettraindata(targets):
-    # Folder path
-    path = r'..\DATA'
-    train_path = 'train'
-    test_path = 'test'
-
-    # File path
-    defog_path = 'defog'
-    tdcsfog_path = 'tdcsfog'
-    sample = pd.read_csv(os.path.join(path, 'sample_submission.csv'))
-    sample.head()
-    sample.info()
-
-    # !Load Train
-    # Load tdcsfog_path
-    sample_cs_path = os.path.join(path, train_path, tdcsfog_path)
+def get_tdcsfog(super_folder_path, folder_path, tdcsfog_path):
+    sample_cs_path = os.path.join(super_folder_path, folder_path, tdcsfog_path)
     tdcsfog_df = []
 
     for dirname, _, filenames in os.walk(sample_cs_path):
@@ -37,9 +23,10 @@ def gettraindata(targets):
     tdcsfog_df.StartHesitation.unique()
     tdcsfog_df.Turn.unique()
     tdcsfog_df.Walking.unique()
+    return tdcsfog_df
 
-    # Load defog_path
-    sample_cs_path = os.path.join(path, train_path, defog_path)
+def get_defog(super_folder_path, folder_path, defog_path):
+    sample_cs_path = os.path.join(super_folder_path, folder_path, defog_path)
     defog_df = []
 
     for dirname, _, filenames in os.walk(sample_cs_path):
@@ -58,6 +45,26 @@ def gettraindata(targets):
 
     defog_df = defog_df.query('Valid==True and Task==True')
     defog_df = defog_df.drop(['Valid', 'Task'], axis=1)
+    return defog_df
+def gettraindata(targets):
+    # Folder path
+    path = r'..\DATA'
+    train_path = 'train'
+    test_path = 'test'
+
+    # File path
+    defog_path = 'defog'
+    tdcsfog_path = 'tdcsfog'
+    sample = pd.read_csv(os.path.join(path, 'sample_submission.csv'))
+    sample.head()
+    sample.info()
+
+    # !Load Train
+    # Load tdcsfog_path
+    tdcsfog_df = get_tdcsfog(path, train_path, tdcsfog_path)
+
+    # Load defog_path
+    defog_df = get_defog(path, train_path, defog_path)
 
     # Merge all train
     all_train_data = pd.concat([tdcsfog_df, defog_df])
@@ -71,8 +78,5 @@ def gettraindata(targets):
     # Create All Feature
     all_features = [feature for feature in all_train_data.columns if
                     feature != 'Id' and feature not in targets and feature != 'Time']
-
-    # !Load Test
-
 
     return all_features, all_train_data

@@ -31,8 +31,6 @@ for Id, group in all_train_data.groupby('Id'):
     lstmmodel.model.fit(X, Y, batch_size=batch, epochs=epochs, verbose=2, validation_split=.2)
 
 # Test model
-
-
 # scores = lstmmodel.model.evaluate(x_val, y_val)
 # print("Accuracy: %.2f%%" % (scores[1]*100))
 
