@@ -20,6 +20,8 @@ def gettraindata(targets):
     sample.head()
     sample.info()
 
+    # !Load Train
+    # Load tdcsfog_path
     sample_cs_path = os.path.join(path, train_path, tdcsfog_path)
     tdcsfog_df = []
 
@@ -36,6 +38,7 @@ def gettraindata(targets):
     tdcsfog_df.Turn.unique()
     tdcsfog_df.Walking.unique()
 
+    # Load defog_path
     sample_cs_path = os.path.join(path, train_path, defog_path)
     defog_df = []
 
@@ -56,6 +59,7 @@ def gettraindata(targets):
     defog_df = defog_df.query('Valid==True and Task==True')
     defog_df = defog_df.drop(['Valid', 'Task'], axis=1)
 
+    # Merge all train
     all_train_data = pd.concat([tdcsfog_df, defog_df])
     all_train_data = all_train_data.astype({'Time': 'int32', 'Turn': 'int8', 'Walking': 'int8',
                                             'StartHesitation': 'int8', 'AccV': 'float16',
@@ -64,18 +68,11 @@ def gettraindata(targets):
     tdcsfog_df = None
     all_train_data.info()
 
-    # all_train_data.describe()
-
-    # for id, group in all_train_data.groupby('Id')[features+targets]:
-    #     sns.lineplot(x='Time',y='AccV', hue='StartHesitation', data=group.iloc[0:4000])
-    #     plt.show()
-    #     sns.lineplot(x='Time', y='AccV', hue='Turn', data=group.iloc[0:4000])
-    #     plt.show()
-    #     sns.lineplot(x='Time', y='AccV', hue='Walking', data=group.iloc[0:4000])
-    #     plt.show()
-    #     break
-
+    # Create All Feature
     all_features = [feature for feature in all_train_data.columns if
                     feature != 'Id' and feature not in targets and feature != 'Time']
+
+    # !Load Test
+
 
     return all_features, all_train_data
