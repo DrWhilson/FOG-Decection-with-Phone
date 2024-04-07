@@ -8,8 +8,10 @@ from sklearn import metrics
 from getDB import gettraindata
 lookback = 3
 targets = ['StartHesitation', 'Turn', 'Walking']
+features = ['Time', 'AccV', 'AccML', 'AccAP']
+accmeasurs = ['AccV', 'AccML', 'AccAP']
 
-all_features, all_train_data = gettraindata(targets)
+all_features, all_train_data, all_test_data = gettraindata(targets, features, accmeasurs)
 
 # Create model
 lstmmodel = LSTMModel(all_features, lookback)
