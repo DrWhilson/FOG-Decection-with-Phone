@@ -1,2 +1,4 @@
-﻿./FOG detection/.*
+﻿./FOG detection/.idea
+./FOG detection/.venv
 ./DATA
+./FOG detection/.keras

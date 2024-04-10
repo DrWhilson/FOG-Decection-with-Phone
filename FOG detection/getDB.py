@@ -79,7 +79,7 @@ def get_defog_cut(super_folder_path, folder_path, defog_path):
     return defog_df
 
 
-def gettraindata(targets, features, accmeasurs):
+def get_train_data(targets, features, accmeasurs):
     # !Folder path
     path = r'..\DATA'
     train_path = 'train'
@@ -106,7 +106,28 @@ def gettraindata(targets, features, accmeasurs):
                                             'AccML': 'float16', 'AccAP': 'float16'})
     defog_df = None
     tdcsfog_df = None
-    all_train_data.info()
+    print(all_train_data.info())
+
+    # !Create All Feature
+    all_features = [feature for feature in all_train_data.columns if
+                    feature != 'Id' and feature not in targets and feature != 'Time']
+    print(all_features)
+
+    return all_features, all_train_data
+
+
+def get_test_data(targets, features, accmeasurs):
+    # !Folder path
+    path = r'..\DATA'
+    train_path = 'train'
+    test_path = 'test'
+
+    # !File path
+    defog_path = 'defog'
+    tdcsfog_path = 'tdcsfog'
+    sample = pd.read_csv(os.path.join(path, 'sample_submission.csv'))
+    sample.head()
+    sample.info()
 
     # !Load Test
     # Load tdcsfog_path
@@ -121,10 +142,10 @@ def gettraindata(targets, features, accmeasurs):
                                           'AccV': 'float16', 'AccML': 'float16', 'AccAP': 'float16'})
     defog_df = None
     tdcsfog_df = None
-    all_test_data.info()
+    print(all_test_data.info())
 
-    # !Create All Feature
-    all_features = [feature for feature in all_train_data.columns if
-                    feature != 'Id' and feature not in targets and feature != 'Time']
+    # # !Create All Feature
+    # all_features = [feature for feature in all_test_data.columns if
+    #                 feature != 'Id' and feature not in targets and feature != 'Time']
 
-    return all_features, all_train_data, all_test_data
+    return all_test_data
