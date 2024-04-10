@@ -3,6 +3,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 from scipy import signal
+from sklearn.model_selection import train_test_split
 
 import os
 
@@ -144,8 +145,9 @@ def get_test_data(targets, features, accmeasurs):
     tdcsfog_df = None
     print(all_test_data.info())
 
-    # # !Create All Feature
-    # all_features = [feature for feature in all_test_data.columns if
-    #                 feature != 'Id' and feature not in targets and feature != 'Time']
-
     return all_test_data
+
+def get_train_test_data(all_train_data):
+    (X_train, Y_train), (X_test, Y_test) = train_test_split()
+
+    return (X_train, Y_train), (X_test, Y_test)

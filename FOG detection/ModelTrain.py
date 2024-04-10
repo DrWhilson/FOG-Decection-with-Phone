@@ -1,9 +1,10 @@
 from ModelDesc import LSTMModel
+from getDB import get_train_data
+from getDB import get_train_test_data
 
 import numpy as np
 
 # Load DB
-from getDB import get_train_data
 lookback = 3
 targets = ['StartHesitation', 'Turn', 'Walking']
 features = ['Time', 'AccV', 'AccML', 'AccAP']
