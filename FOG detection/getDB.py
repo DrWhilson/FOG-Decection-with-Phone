@@ -84,7 +84,6 @@ def get_train_data(targets, features, accmeasurs):
     # !Folder path
     path = r'..\DATA'
     train_path = 'train'
-    test_path = 'test'
 
     # !File path
     defog_path = 'defog'
@@ -120,7 +119,6 @@ def get_train_data(targets, features, accmeasurs):
 def get_test_data(targets, features, accmeasurs):
     # !Folder path
     path = r'..\DATA'
-    train_path = 'train'
     test_path = 'test'
 
     # !File path
@@ -147,7 +145,25 @@ def get_test_data(targets, features, accmeasurs):
 
     return all_test_data
 
-def get_train_test_data(all_train_data):
-    (X_train, Y_train), (X_test, Y_test) = train_test_split()
 
-    return (X_train, Y_train), (X_test, Y_test)
+def get_train_test_data(all_train_data, all_features, lookback, targets):
+    # By individual person
+    # for Id, group in all_train_data.groupby('Id'):
+    #     df = group.set_index('Time')
+    #     X = np.hstack([df[all_features].values[0:-2],
+    #                    df.iloc[1:][all_features].values[0:-1],
+    #                    df.iloc[2:][all_features].values])
+    #     X = np.reshape(X, (-1, lookback, len(all_features)))
+    #     Y = df[targets]
+
+    # For all person
+    df = all_train_data.set_index('Time')
+    x = np.hstack([df[all_features].values[:-2],
+                   df.iloc[1:][all_features].values[:-1],
+                   df.iloc[2:][all_features].values])
+    x = np.reshape(x, (-1, lookback, len(all_features)))
+    y = df[targets].values[:-2]
+
+    X_train, X_test, y_train, y_test  = train_test_split(x, y, test_size=0.1, random_state=1)
+
+    return X_train, X_test, y_train, y_test
