@@ -1,28 +1,21 @@
+from getDB import get_train_data
+from getDB import get_train_test_data
+
 import numpy as np
 import tensorflow as tf
 
 # Load DB
-from getDB import get_test_data
-
 lookback = 3
 targets = ['StartHesitation', 'Turn', 'Walking']
 features = ['Time', 'AccV', 'AccML', 'AccAP']
-accmeasurs = ['AccV', 'AccML', 'AccAP']
+acc_measures = ['AccV', 'AccML', 'AccAP']
 
-all_test_data = get_test_data(targets, features, accmeasurs)
+all_features, all_train_data = get_train_data(targets, features, acc_measures)
+X_train, X_test, y_train, y_test = get_train_test_data(all_train_data, all_features, lookback, targets)
 
 # Create model
 lstmmodel = tf.keras.models.load_model('lstmmodel.keras')
 
 # Test model
-for Id, group in all_test_data.groupby('Id'):
-    df = group.set_index('Time')
-    X = np.hstack([df[accmeasurs].values[0:-2],
-                   df.iloc[1:][accmeasurs].values[0:-1],
-                   df.iloc[2:][accmeasurs].values])
-    X = np.reshape(X, (-1, lookback, len(accmeasurs)))
-    print(df.shape)
-    Y = df[targets].values[0:-2]
-
-    scores = lstmmodel.model.evaluate(X, Y)
-    print("Accuracy: %.2f%%" % (scores[1]*100))
+scores = lstmmodel.model.evaluate(X_test, y_test)
+print("Accuracy: %.2f%%" % (scores[1]*100))
