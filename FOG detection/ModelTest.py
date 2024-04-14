@@ -17,5 +17,5 @@ X_train, X_test, y_train, y_test = get_train_test_data(all_train_data, all_featu
 lstmmodel = tf.keras.models.load_model('lstmmodel.keras')
 
 # Test model
-scores = lstmmodel.model.evaluate(X_test, y_test)
+scores = lstmmodel.evaluate(X_test, y_test)
 print("Accuracy: %.2f%%" % (scores[1]*100))
