@@ -25,8 +25,8 @@ epochs = 50
 for Id, group in all_train_data.groupby('Id'):
     df = group.set_index('Time')
     X = np.hstack([df[all_features].values[0:-2],
-                    df.iloc[1:][all_features].values[0:-1],
-                    df.iloc[2:][all_features].values])
+                   df.iloc[1:][all_features].values[0:-1],
+                   df.iloc[2:][all_features].values])
     X = np.reshape(X, (-1, lookback, len(all_features)))
     Y = df[targets]
 
@@ -36,4 +36,4 @@ for Id, group in all_train_data.groupby('Id'):
 # lstm_model.model.evaluate(X_test, y_test)
 
 # Save model
-lstm_model.model.save('lstmmodel.keras')
+lstm_model.model.save('lstmmodel_individual.keras')

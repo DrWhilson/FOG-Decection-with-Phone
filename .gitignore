@@ -2,3 +2,19 @@
 ./FOG detection/.venv
 ./DATA
 ./FOG detection/*.keras
+
+./FOG mobile/*.iml
+./FOG mobile/.gradle
+./FOG mobile/local.properties
+./FOG mobile/.idea/caches
+./FOG mobile/.idea/libraries
+./FOG mobile/.idea/modules.xml
+./FOG mobile/.idea/workspace.xml
+./FOG mobile/.idea/navEditor.xml
+./FOG mobile/.idea/assetWizardSettings.xml
+./FOG mobile/.DS_Store
+./FOG mobile/build
+./FOG mobile/captures
+./FOG mobile/.externalNativeBuild
+./FOG mobile/.cxx
+./FOG mobile/local.properties

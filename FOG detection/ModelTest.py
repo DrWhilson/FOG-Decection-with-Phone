@@ -17,5 +17,13 @@ X_train, X_test, y_train, y_test = get_train_test_data(all_train_data, all_featu
 lstmmodel = tf.keras.models.load_model('lstmmodel.keras')
 
 # Test model
-scores = lstmmodel.evaluate(X_test, y_test)
-print("Accuracy: %.2f%%" % (scores[1]*100))
+for Id, group in all_train_data.groupby('Id'):
+    df = group.set_index('Time')
+    X = np.hstack([df[all_features].values[0:-2],
+                   df.iloc[1:][all_features].values[0:-1],
+                   df.iloc[2:][all_features].values])
+    X = np.reshape(X, (-1, lookback, len(all_features)))
+    Y = df[targets].values[0:-2]
+
+    scores = lstmmodel.evaluate(X, Y)
+    print("Accuracy: %.2f%%" % (scores[1]*100))
