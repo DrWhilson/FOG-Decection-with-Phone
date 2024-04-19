@@ -28,4 +28,4 @@ lstm_model.model.fit(X_train, y_train, batch_size=batch, epochs=epochs, verbose=
 lstm_model.model.evaluate(X_test, y_test)
 
 # Save model
-lstm_model.model.save('lstmmodel_individual.keras')
+lstm_model.model.save('lstmmodel.keras')
