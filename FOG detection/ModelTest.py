@@ -27,3 +27,6 @@ for Id, group in all_train_data.groupby('Id'):
 
     scores = lstmmodel.evaluate(X, Y)
     print("Accuracy: %.2f%%" % (scores[1]*100))
+
+scores = lstmmodel.evaluate(X_test, y_test)
+print("Accuracy: %.2f%%" % (scores[1]*100))
