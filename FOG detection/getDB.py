@@ -157,6 +157,7 @@ def get_train_test_data(all_train_data, all_features, lookback, targets):
     #     Y = df[targets]
 
     # For all person
+    # Chose features
     df = all_train_data.set_index('Time')
     x = np.hstack([df[all_features].values[:-2],
                    df.iloc[1:][all_features].values[:-1],
@@ -164,6 +165,7 @@ def get_train_test_data(all_train_data, all_features, lookback, targets):
     x = np.reshape(x, (-1, lookback, len(all_features)))
     y = df[targets].values[:-2]
 
+    # Split
     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.1, random_state=1)
 
     return x_train, x_test, y_train, y_test
