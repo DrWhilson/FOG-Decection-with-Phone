@@ -118,6 +118,10 @@ def get_train_data(targets, features, accmeasurs):
     all_train_data = all_train_data.drop('Walking', axis=1)
     all_train_data = all_train_data.drop('StartHesitation', axis=1)
 
+    # Change Event datatype to int8
+    all_train_data = all_train_data.astype({'Time': 'int32', 'AccV': 'float16', 'AccML': 'float16',
+                                            'AccAP': 'float16', 'Event': 'int8'})
+
     # Vive data describe
     print(all_train_data.info())
     print(all_train_data.head())
