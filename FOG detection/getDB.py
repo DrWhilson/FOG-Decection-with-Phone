@@ -109,7 +109,18 @@ def get_train_data(targets, features, accmeasurs):
 
     # Delete unusual data
     all_train_data = all_train_data.loc[(all_train_data[['AccV', 'AccML', 'AccAP']] <= 9.81).all(axis=1)]
+
+    # Merge event types
+    all_train_data['Event'] = (all_train_data['Turn'] | all_train_data['Walking'] | all_train_data['StartHesitation']).astype(int)
+
+    # Drop old events type
+    all_train_data = all_train_data.drop('Turn', axis=1)
+    all_train_data = all_train_data.drop('Walking', axis=1)
+    all_train_data = all_train_data.drop('StartHesitation', axis=1)
+
+    # Vive data describe
     print(all_train_data.info())
+    print(all_train_data.head())
 
     # !Create All Feature
     all_features = [feature for feature in all_train_data.columns if
