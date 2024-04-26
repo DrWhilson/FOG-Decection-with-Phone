@@ -134,29 +134,36 @@ def get_train_data(targets, features, accmeasurs):
     return all_features, all_train_data
 
 
-def get_train_test_data(all_train_data, all_features, lookback, targets):
-    # By individual person
-    # for Id, group in all_train_data.groupby('Id'):
-    #     df = group.set_index('Time')
-    #     X = np.hstack([df[all_features].values[0:-2],
-    #                    df.iloc[1:][all_features].values[0:-1],
-    #                    df.iloc[2:][all_features].values])
-    #     X = np.reshape(X, (-1, lookback, len(all_features)))
-    #     Y = df[targets]
+def get_tr_val_tst_data(all_train_data, all_features, lookback, targets):
+    # Create empty df for train, val, test
+    train = pd.DataFrame(columns=all_train_data.columns)
+    val = pd.DataFrame(columns=all_train_data.columns)
+    test = pd.DataFrame(columns=all_train_data.columns)
 
-    # For all person
-    # Chose features
-    df = all_train_data.set_index('Time')
-    x = np.hstack([df[all_features].values[:-2],
-                   df.iloc[1:][all_features].values[:-1],
-                   df.iloc[2:][all_features].values])
-    x = np.reshape(x, (-1, lookback, len(all_features)))
-    y = df[targets].values[:-2]
+    # Get id groups, for train 70%, val 20%, test 10%
+    ids = all_train_data['Id'].unique()
+    data_len = len(ids)
+    train_id = ids[0:int(data_len*0.7)]
+    val_id = ids[int(data_len*0.7):int(data_len*0.9)]
+    test_id = ids[int(data_len*0.9):]
 
-    # Split
-    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.1, random_state=1)
+    # Split all_train_data to train, val, test by person id
+    for Id, group in all_train_data.groupby('Id'):
+        if Id in train_id:
+            train = pd.concat([train, group])
+        if Id in val_id:
+            val = pd.concat([val, group])
+        if Id in test_id:
+            test = pd.concat([test, group])
 
-    return x_train, x_test, y_train, y_test
+    # Vive result info
+    print(train.info)
+    print(val.info)
+    print(test.info)
+
+    print(len(train_id), ' - ', len(train['Id'].unique()))
+
+    return train, val, test
 
 
 def get_test_data(targets, features, accmeasurs):
