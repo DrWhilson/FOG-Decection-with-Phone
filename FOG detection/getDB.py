@@ -9,43 +9,42 @@ import os
 
 
 class WindowGenerator:
-  def __init__(self, input_width, label_width, shift,
-               train_df, val_df, test_df,
-               label_columns=None):
-    # Store the raw data
-    self.train_df = train_df
-    self.val_df = val_df
-    self.test_df = test_df
+    def __init__(self, input_width, label_width, shift,
+                 train_df, val_df, test_df,
+                 label_columns=None):
+        # Store the raw data
+        self.train_df = train_df
+        self.val_df = val_df
+        self.test_df = test_df
 
-    # Work out the label column indices
-    self.label_columns = label_columns
-    if label_columns is not None:
-      self.label_columns_indices = {name: i for i, name in
-                                    enumerate(label_columns)}
-    self.column_indices = {name: i for i, name in
-                           enumerate(train_df.columns)}
+        # Work out the label column indices
+        self.label_columns = label_columns
+        if label_columns is not None:
+            self.label_columns_indices = {name: i for i, name in
+                                          enumerate(label_columns)}
+        self.column_indices = {name: i for i, name in
+                               enumerate(train_df.columns)}
 
-    # Work out the window parameters
-    self.input_width = input_width
-    self.label_width = label_width
-    self.shift = shift
+        # Work out the window parameters
+        self.input_width = input_width
+        self.label_width = label_width
+        self.shift = shift
 
-    self.total_window_size = input_width + shift
+        self.total_window_size = input_width + shift
 
-    self.input_slice = slice(0, input_width)
-    self.input_indices = np.arange(self.total_window_size)[self.input_slice]
+        self.input_slice = slice(0, input_width)
+        self.input_indices = np.arange(self.total_window_size)[self.input_slice]
 
-    self.label_start = self.total_window_size - self.label_width
-    self.labels_slice = slice(self.label_start, None)
-    self.label_indices = np.arange(self.total_window_size)[self.labels_slice]
+        self.label_start = self.total_window_size - self.label_width
+        self.labels_slice = slice(self.label_start, None)
+        self.label_indices = np.arange(self.total_window_size)[self.labels_slice]
 
-
-  def __repr__(self):
-    return '\n'.join([
-        f'Total window size: {self.total_window_size}',
-        f'Input indices: {self.input_indices}',
-        f'Label indices: {self.label_indices}',
-        f'Label column name(s): {self.label_columns}'])
+    def __repr__(self):
+        return '\n'.join([
+            f'Total window size: {self.total_window_size}',
+            f'Input indices: {self.input_indices}',
+            f'Label indices: {self.label_indices}',
+            f'Label column name(s): {self.label_columns}'])
 
 
 def get_tdcsfog_full(super_folder_path, folder_path, tdcsfog_path):
@@ -151,7 +150,8 @@ def get_train_data(targets, features, accmeasurs):
     all_train_data = all_train_data.loc[(all_train_data[['AccV', 'AccML', 'AccAP']] <= 9.81).all(axis=1)]
 
     # Merge event types
-    all_train_data['Event'] = (all_train_data['Turn'] | all_train_data['Walking'] | all_train_data['StartHesitation']).astype(int)
+    all_train_data['Event'] = (
+                all_train_data['Turn'] | all_train_data['Walking'] | all_train_data['StartHesitation']).astype(int)
 
     # Drop old events type
     all_train_data = all_train_data.drop('Turn', axis=1)
@@ -183,9 +183,9 @@ def get_tr_val_tst_data(all_train_data, all_features, lookback, targets):
     # Get id groups, for train 70%, val 20%, test 10%
     ids = all_train_data['Id'].unique()
     data_len = len(ids)
-    train_id = ids[0:int(data_len*0.7)]
-    val_id = ids[int(data_len*0.7):int(data_len*0.9)]
-    test_id = ids[int(data_len*0.9):]
+    train_id = ids[0:int(data_len * 0.7)]
+    val_id = ids[int(data_len * 0.7):int(data_len * 0.9)]
+    test_id = ids[int(data_len * 0.9):]
 
     # Split all_train_data to train, val, test by person id
     for Id, group in all_train_data.groupby('Id'):
