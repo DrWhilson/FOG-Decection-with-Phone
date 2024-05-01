@@ -12,8 +12,8 @@ class LSTMModel:
     def __init__(self, all_features, lookback):
         tf.config.run_functions_eagerly(True)
 
-        losses = ['categorical_crossentropy']
-        metrics = [CategoricalAccuracy(), Precision()]
+        # losses = ['categorical_crossentropy']
+        # metrics = [CategoricalAccuracy(), Precision()]
 
         model = Sequential(name='Prediction_Gait')
         model.add(LSTM(80, input_shape=(lookback, len(all_features),), return_sequences=True))
@@ -27,6 +27,6 @@ class LSTMModel:
         model.add(Dense(10, activation='sigmoid'))
 
         model.add(Dense(3, activation='softmax'))
-        model.compile(optimizer=Adam(learning_rate=0.01), loss=losses, metrics=metrics)
+        # model.compile(optimizer=Adam(learning_rate=0.01), loss=losses, metrics=metrics)
 
         self.model = model
