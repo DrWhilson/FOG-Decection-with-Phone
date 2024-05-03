@@ -41,7 +41,9 @@ train, val, test = get_tr_val_tst_data(all_train_data, all_features, lookback, t
 # Create window
 wide_window = WindowGenerator(
     input_width=12000, label_width=1, shift=100,
-    train_df=train, val_df=val, test_df=test,
+    train_df=train.drop(['Id'], axis=1),
+    val_df=val.drop(['Id'], axis=1),
+    test_df=test.drop(['Id'], axis=1),
     label_columns=features)
 
 # Create model
