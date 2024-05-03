@@ -48,38 +48,6 @@ def get_defog_full(super_folder_path, folder_path, defog_path):
     return defog_df
 
 
-def get_tdcsfog_cut(super_folder_path, folder_path, tdcsfog_path):
-    sample_cs_path = os.path.join(super_folder_path, folder_path, tdcsfog_path)
-    tdcsfog_df = []
-
-    for dirname, _, filenames in os.walk(sample_cs_path):
-        for filename in filenames:
-            df = pd.read_csv(os.path.join(dirname, filename))
-            df['Id'] = filename[0:filename.index('.')]
-            tdcsfog_df.append(df)
-
-    tdcsfog_df = pd.concat(tdcsfog_df, ignore_index=True)
-    tdcsfog_df.head()
-
-    return tdcsfog_df
-
-
-def get_defog_cut(super_folder_path, folder_path, defog_path):
-    sample_cs_path = os.path.join(super_folder_path, folder_path, defog_path)
-    defog_df = []
-
-    for dirname, _, filenames in os.walk(sample_cs_path):
-        for filename in filenames:
-            df = pd.read_csv(os.path.join(dirname, filename))
-            df['Id'] = filename[0:filename.index('.')]
-            defog_df.append(df)
-
-    defog_df = pd.concat(defog_df, ignore_index=True)
-    defog_df.head()
-
-    return defog_df
-
-
 def get_train_data(targets, features, accmeasurs):
     # !Folder path
     path = r'..\DATA'
@@ -163,33 +131,3 @@ def get_tr_val_tst_data(all_train_data, all_features, lookback, targets):
     print(test.info)
 
     return train, val, test
-
-
-def get_test_data(targets, features, accmeasurs):
-    # !Folder path
-    path = r'..\DATA'
-    test_path = 'test'
-
-    # !File path
-    defog_path = 'defog'
-    tdcsfog_path = 'tdcsfog'
-    sample = pd.read_csv(os.path.join(path, 'sample_submission.csv'))
-    sample.head()
-    sample.info()
-
-    # !Load Test
-    # Load tdcsfog_path
-    tdcsfog_df = get_tdcsfog_cut(path, test_path, tdcsfog_path)
-
-    # Load defog_path
-    defog_df = get_defog_cut(path, test_path, defog_path)
-
-    # Merge all test
-    all_test_data = pd.concat([tdcsfog_df, defog_df])
-    all_test_data = all_test_data.astype({'Time': 'int32',
-                                          'AccV': 'float16', 'AccML': 'float16', 'AccAP': 'float16'})
-    defog_df = None
-    tdcsfog_df = None
-    print(all_test_data.info())
-
-    return all_test_data
