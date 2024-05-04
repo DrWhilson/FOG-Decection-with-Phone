@@ -13,13 +13,6 @@ class LSTMModel:
         tf.config.run_functions_eagerly(True)
 
         input_shape = None
-        targets_shape = None
-
-        for inputs, targets in wide_window.train.take(1):
-            input_shape = inputs.shape
-            targets_shape = targets.shape
-            print("TG SH", targets_shape)
-            print("IN SH", input_shape)
 
         for inputs, targets in wide_window.train.take(1):
             input_shape = inputs.shape[1:]
@@ -36,9 +29,5 @@ class LSTMModel:
         model.add(Dense(10, activation='sigmoid'))
 
         model.add(Dense(4, activation='softmax'))
-
-        # losses = ['categorical_crossentropy']
-        # metrics = [CategoricalAccuracy(), Precision()]
-        # model.compile(optimizer=Adam(learning_rate=0.01), loss=losses, metrics=metrics)
 
         self.model = model

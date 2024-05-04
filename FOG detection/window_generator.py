@@ -76,12 +76,6 @@ class WindowGenerator:
 
         ds = ds.map(self.dropax)
 
-        # for inputs, targets in ds.take(1):
-        #     input_shape = inputs.shape
-        #     targets_shape = targets.shape
-        #     print("IN", input_shape)
-        #     print("TG", targets_shape)
-
         return ds
 
     @property
