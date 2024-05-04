@@ -55,8 +55,15 @@ class WindowGenerator:
 
         return inputs, labels
 
+    # Drop Shadow Axis
+    def dropax(self, inputs, targets):
+        targets = tf.squeeze(targets, axis=1)
+        # inputs = tf.squeeze(inputs, axis=0)
+        return inputs, targets
+
     def make_dataset(self, data):
         data = np.array(data, dtype=np.float32)
+
         ds = tf.keras.utils.timeseries_dataset_from_array(
             data=data,
             targets=None,
@@ -66,6 +73,14 @@ class WindowGenerator:
             batch_size=32, )
 
         ds = ds.map(self.split_window)
+
+        ds = ds.map(self.dropax)
+
+        # for inputs, targets in ds.take(1):
+        #     input_shape = inputs.shape
+        #     targets_shape = targets.shape
+        #     print("IN", input_shape)
+        #     print("TG", targets_shape)
 
         return ds
 

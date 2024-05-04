@@ -9,14 +9,23 @@ import tensorflow as tf
 class LSTMModel:
     model = Sequential()
 
-    def __init__(self, all_features, lookback):
+    def __init__(self, wide_window, features, batch_size=32):
         tf.config.run_functions_eagerly(True)
 
-        # losses = ['categorical_crossentropy']
-        # metrics = [CategoricalAccuracy(), Precision()]
+        input_shape = None
+        targets_shape = None
+
+        for inputs, targets in wide_window.train.take(1):
+            input_shape = inputs.shape
+            targets_shape = targets.shape
+            print("TG SH", targets_shape)
+            print("IN SH", input_shape)
+
+        for inputs, targets in wide_window.train.take(1):
+            input_shape = inputs.shape[1:]
 
         model = Sequential(name='Prediction_Gait')
-        model.add(LSTM(80, input_shape=(lookback, len(all_features),), return_sequences=True))
+        model.add(LSTM(80, input_shape=input_shape, return_sequences=True))
 
         model.add(LSTM(128, activation='relu'))
 
@@ -26,7 +35,10 @@ class LSTMModel:
 
         model.add(Dense(10, activation='sigmoid'))
 
-        model.add(Dense(3, activation='softmax'))
+        model.add(Dense(4, activation='softmax'))
+
+        # losses = ['categorical_crossentropy']
+        # metrics = [CategoricalAccuracy(), Precision()]
         # model.compile(optimizer=Adam(learning_rate=0.01), loss=losses, metrics=metrics)
 
         self.model = model
