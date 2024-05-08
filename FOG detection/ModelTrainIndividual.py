@@ -37,47 +37,35 @@ features = ['Time', 'AccV', 'AccML', 'AccAP']
 acc_measures = ['AccV', 'AccML', 'AccAP']
 
 all_features, all_train_data = get_train_data(targets, features, acc_measures)
-train, val, test = get_tr_val_tst_data(all_train_data, all_features, lookback, targets)
 
-# Create window
-prepare_train = train.drop(['Id'], axis=1)
-prepare_val = val.drop(['Id'], axis=1)
-prepare_test = test.drop(['Id'], axis=1)
+# Пet the first patient's data
+ids = all_train_data['Id'].unique()
+characteristic_group = all_train_data[all_train_data['Id'] == ids[0]]
 
-wide_window = WindowGenerator(
+# Split first patient's data
+train, val, test = group_split(characteristic_group)
+
+# Get characteristic window
+characteristic_window = WindowGenerator(
     input_width=100, label_width=1, shift=10,
-    train_df=prepare_train, val_df=prepare_val, test_df=prepare_test,
+    train_df=train.drop(['Id'], axis=1),
+    val_df=val.drop(['Id'], axis=1),
+    test_df=test.drop(['Id'], axis=1),
     label_columns=features)
 
-input_shape = None
-
-for inputs, targets in wide_window.train.take(1):
-    input_shape = inputs.shape[1:]
-
-print("SHAPE!", input_shape)
-
 # Create model
-lstm_model = LSTMModel(wide_window, features, lookback)
+lstm_model = LSTMModel(characteristic_window, features, lookback)
 
 # Train model individual
 for Id, group in all_train_data.groupby('Id'):
     train, val, test = group_split(group)
 
-    prepare_train = train.drop(['Id'], axis=1)
-    prepare_val = val.drop(['Id'], axis=1)
-    prepare_test = test.drop(['Id'], axis=1)
-
     individual_window = WindowGenerator(
         input_width=100, label_width=1, shift=10,
-        train_df=prepare_train, val_df=prepare_val, test_df=prepare_test,
+        train_df=train.drop(['Id'], axis=1),
+        val_df=val.drop(['Id'], axis=1),
+        test_df=test.drop(['Id'], axis=1),
         label_columns=features)
-
-    input_shape = None
-
-    for inputs, targets in individual_window.train.take(1):
-        input_shape = inputs.shape[1:]
-
-    print("SHAPE!", input_shape)
 
     compile_and_fit(lstm_model.model, individual_window)
 
