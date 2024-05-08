@@ -45,7 +45,7 @@ prepare_test = test.drop(['Id'], axis=1)
 
 wide_window = WindowGenerator(
     input_width=100, label_width=1, shift=10,
-    train_df=prepare_val, val_df=prepare_test, test_df=prepare_test,
+    train_df=prepare_train, val_df=prepare_val, test_df=prepare_test,
     label_columns=features)
 
 # Create model

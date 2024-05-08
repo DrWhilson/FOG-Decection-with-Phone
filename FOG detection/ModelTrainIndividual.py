@@ -46,8 +46,15 @@ prepare_test = test.drop(['Id'], axis=1)
 
 wide_window = WindowGenerator(
     input_width=100, label_width=1, shift=10,
-    train_df=prepare_val, val_df=prepare_test, test_df=prepare_test,
+    train_df=prepare_train, val_df=prepare_val, test_df=prepare_test,
     label_columns=features)
+
+input_shape = None
+
+for inputs, targets in wide_window.train.take(1):
+    input_shape = inputs.shape[1:]
+
+print("SHAPE!", input_shape)
 
 # Create model
 lstm_model = LSTMModel(wide_window, features, lookback)
@@ -62,10 +69,17 @@ for Id, group in all_train_data.groupby('Id'):
 
     individual_window = WindowGenerator(
         input_width=100, label_width=1, shift=10,
-        train_df=prepare_val, val_df=prepare_test, test_df=prepare_test,
+        train_df=prepare_train, val_df=prepare_val, test_df=prepare_test,
         label_columns=features)
 
-    compile_and_fit(lstm_model.model, wide_window)
+    input_shape = None
+
+    for inputs, targets in individual_window.train.take(1):
+        input_shape = inputs.shape[1:]
+
+    print("SHAPE!", input_shape)
+
+    compile_and_fit(lstm_model.model, individual_window)
 
 # Save model
 lstm_model.model.save('lstm_model.keras')
