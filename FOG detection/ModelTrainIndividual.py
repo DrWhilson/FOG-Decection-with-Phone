@@ -1,6 +1,7 @@
 from ModelDesc import LSTMModel
 from getDB import get_train_data
 from getDB import get_tr_val_tst_data
+from getDB import group_split
 from window_generator import WindowGenerator
 
 import tensorflow as tf
@@ -51,8 +52,20 @@ wide_window = WindowGenerator(
 # Create model
 lstm_model = LSTMModel(wide_window, features, lookback)
 
-# Train model
-compile_and_fit(lstm_model.model, wide_window)
+# Train model individual
+for Id, group in all_train_data.groupby('Id'):
+    train, val, test = group_split(group)
+
+    prepare_train = train.drop(['Id'], axis=1)
+    prepare_val = val.drop(['Id'], axis=1)
+    prepare_test = test.drop(['Id'], axis=1)
+
+    individual_window = WindowGenerator(
+        input_width=100, label_width=1, shift=10,
+        train_df=prepare_val, val_df=prepare_test, test_df=prepare_test,
+        label_columns=features)
+
+    compile_and_fit(lstm_model.model, wide_window)
 
 # Save model
 lstm_model.model.save('lstm_model.keras')

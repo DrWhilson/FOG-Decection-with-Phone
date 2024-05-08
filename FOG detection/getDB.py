@@ -91,6 +91,9 @@ def get_train_data(targets, features, accmeasurs):
     all_train_data = all_train_data.astype({'Time': 'int32', 'AccV': 'float16', 'AccML': 'float16',
                                             'AccAP': 'float16', 'Event': 'int8'})
 
+    # Compressing time indicators
+    all_train_data = all_train_data[::10]
+
     # Vive data describe
     print(all_train_data.info())
     print(all_train_data.head())
@@ -124,6 +127,21 @@ def get_tr_val_tst_data(all_train_data, all_features, lookback, targets):
             val = pd.concat([val, group])
         if Id in test_id:
             test = pd.concat([test, group])
+
+    # Vive data describe
+    print(train.info)
+    print(val.info)
+    print(test.info)
+
+    return train, val, test
+
+
+def group_split(group):
+    # Get id groups, for train 70%, val 20%, test 10%
+    data_len = len(group)
+    train = group[0:int(data_len * 0.7)]
+    val = group[int(data_len * 0.7):int(data_len * 0.9)]
+    test = group[int(data_len * 0.9):]
 
     # Vive data describe
     print(train.info)
