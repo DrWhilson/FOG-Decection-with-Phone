@@ -21,7 +21,7 @@ def compile_and_fit(model, window, patience=2):
 
     model.compile(loss=losses, optimizer=tf.keras.optimizers.Adam(), metrics=metrics)
 
-    lstm_model.model.summary()
+    model.summary()
 
     history = model.fit(window.train, epochs=epochs,
                         validation_data=window.val)

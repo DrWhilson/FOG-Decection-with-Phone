@@ -22,7 +22,7 @@ def compile_and_fit(model, window, patience=2):
 
     model.compile(loss=losses, optimizer=tf.keras.optimizers.Adam(), metrics=metrics)
 
-    lstm_model.model.summary()
+    model.summary()
 
     history = model.fit(window.train, epochs=epochs,
                         validation_data=window.val)
@@ -45,10 +45,13 @@ characteristic_group = all_train_data[all_train_data['Id'] == ids[0]]
 # Split first patient's data
 train, val, test = group_split(characteristic_group)
 
-# initialize constants
+# Initialize constants
 window_input_width = 10
 window_label_width = 1
 window_shift = 10
+epochs = 20
+losses = ['categorical_crossentropy']
+metrics = [CategoricalAccuracy(), Precision()]
 
 # Get characteristic window
 characteristic_window = WindowGenerator(
@@ -60,6 +63,8 @@ characteristic_window = WindowGenerator(
 
 # Create model
 lstm_model = LSTMModel(characteristic_window, features, lookback)
+lstm_model.model.compile(loss=losses, optimizer=tf.keras.optimizers.Adam(), metrics=metrics)
+lstm_model.model.summary()
 
 # Train model individual
 for Id, group in all_train_data.groupby('Id'):
@@ -74,7 +79,8 @@ for Id, group in all_train_data.groupby('Id'):
         test_df=test.drop(['Id'], axis=1),
         label_columns=features)
 
-    compile_and_fit(lstm_model.model, individual_window)
+    lstm_model.model.fit(individual_window.train, epochs=epochs,
+                         validation_data=individual_window.val)
 
 # Save model
 lstm_model.model.save('lstm_model.keras')
