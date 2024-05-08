@@ -45,9 +45,14 @@ characteristic_group = all_train_data[all_train_data['Id'] == ids[0]]
 # Split first patient's data
 train, val, test = group_split(characteristic_group)
 
+# initialize constants
+window_input_width = 10
+window_label_width = 1
+window_shift = 10
+
 # Get characteristic window
 characteristic_window = WindowGenerator(
-    input_width=100, label_width=1, shift=10,
+    input_width=window_input_width, label_width=window_label_width, shift=window_shift,
     train_df=train.drop(['Id'], axis=1),
     val_df=val.drop(['Id'], axis=1),
     test_df=test.drop(['Id'], axis=1),
@@ -60,8 +65,10 @@ lstm_model = LSTMModel(characteristic_window, features, lookback)
 for Id, group in all_train_data.groupby('Id'):
     train, val, test = group_split(group)
 
+    print("!Len: ", len(train))
+
     individual_window = WindowGenerator(
-        input_width=100, label_width=1, shift=10,
+        input_width=window_input_width, label_width=window_label_width, shift=window_shift,
         train_df=train.drop(['Id'], axis=1),
         val_df=val.drop(['Id'], axis=1),
         test_df=test.drop(['Id'], axis=1),
