@@ -10,26 +10,6 @@ from keras.losses import CategoricalCrossentropy
 from keras.optimizers import Adam
 
 
-def compile_and_fit(model, window, patience=2):
-    epochs = 20
-    # losses = [CategoricalCrossentropy()]
-    losses = ['categorical_crossentropy']
-    metrics = [CategoricalAccuracy(), Precision()]
-
-    # early_stopping = tf.keras.callbacks.EarlyStopping(monitor='val_loss',
-    #                                                   patience=patience,
-    #                                                   mode='min')
-
-    model.compile(loss=losses, optimizer=tf.keras.optimizers.Adam(), metrics=metrics)
-
-    model.summary()
-
-    history = model.fit(window.train, epochs=epochs,
-                        validation_data=window.val)
-                        # callbacks=[early_stopping])
-    return history
-
-
 # Load DB
 lookback = 3
 targets = ['Event']
