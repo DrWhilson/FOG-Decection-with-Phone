@@ -11,8 +11,7 @@ from keras.optimizers import Adam
 
 def compile_and_fit(model, window, patience=2):
     epochs = 20
-    # losses = [CategoricalCrossentropy()]
-    losses = ['categorical_crossentropy']
+    losses = ['binary_crossentropy']
     metrics = [CategoricalAccuracy(), Precision()]
 
     # early_stopping = tf.keras.callbacks.EarlyStopping(monitor='val_loss',
@@ -44,7 +43,7 @@ prepare_val = val.drop(['Id'], axis=1)
 prepare_test = test.drop(['Id'], axis=1)
 
 wide_window = WindowGenerator(
-    input_width=100, label_width=1, shift=10,
+    input_width=100, label_width=1, shift=0,
     train_df=prepare_train, val_df=prepare_val, test_df=prepare_test,
     label_columns=features)
 

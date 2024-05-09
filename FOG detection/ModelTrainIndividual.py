@@ -50,7 +50,7 @@ window_input_width = 10
 window_label_width = 1
 window_shift = 0
 epochs = 20
-losses = ['categorical_crossentropy']
+losses = ['binary_crossentropy']
 metrics = [CategoricalAccuracy(), Precision()]
 
 # Get characteristic window
