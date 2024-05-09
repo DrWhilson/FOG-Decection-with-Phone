@@ -143,9 +143,4 @@ def group_split(group):
     val = group[int(data_len * 0.7):int(data_len * 0.9)]
     test = group[int(data_len * 0.9):]
 
-    # Vive data describe
-    print(train.info)
-    print(val.info)
-    print(test.info)
-
     return train, val, test

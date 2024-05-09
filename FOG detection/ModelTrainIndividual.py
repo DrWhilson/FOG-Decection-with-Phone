@@ -5,7 +5,7 @@ from getDB import group_split
 from window_generator import WindowGenerator
 
 import tensorflow as tf
-from keras.metrics import CategoricalAccuracy, Precision
+from keras.metrics import CategoricalAccuracy, Precision, Recall, F1Score
 from keras.losses import CategoricalCrossentropy
 from keras.optimizers import Adam
 
@@ -31,7 +31,7 @@ window_label_width = 1
 window_shift = 0
 epochs = 20
 losses = ['binary_crossentropy']
-metrics = [CategoricalAccuracy(), Precision()]
+metrics = [F1Score()]
 
 # Get characteristic window
 characteristic_window = WindowGenerator(
