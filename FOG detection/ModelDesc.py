@@ -21,12 +21,14 @@ class LSTMModel:
         model.add(LSTM(80, input_shape=input_shape, return_sequences=True))
 
         model.add(LSTM(128, activation='relu'))
+        model.add(Dropout(0.2))
 
         model.add(Dense(80, activation='relu'))
         model.add(Dense(64, activation='relu'))
         model.add(Dense(32, activation='relu'))
 
         model.add(Dense(10, activation='sigmoid'))
+        model.add(Dropout(0.2))
 
         model.add(Dense(4, activation='softmax'))
 

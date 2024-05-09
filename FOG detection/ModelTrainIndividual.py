@@ -48,7 +48,7 @@ train, val, test = group_split(characteristic_group)
 # Initialize constants
 window_input_width = 10
 window_label_width = 1
-window_shift = 10
+window_shift = 0
 epochs = 20
 losses = ['categorical_crossentropy']
 metrics = [CategoricalAccuracy(), Precision()]
@@ -71,6 +71,7 @@ for Id, group in all_train_data.groupby('Id'):
     train, val, test = group_split(group)
 
     print("!Len: ", len(train))
+    print("!Events:", train['Event'].value_counts())
 
     individual_window = WindowGenerator(
         input_width=window_input_width, label_width=window_label_width, shift=window_shift,
