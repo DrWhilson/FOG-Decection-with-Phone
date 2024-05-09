@@ -30,6 +30,6 @@ class LSTMModel:
         model.add(Dense(10, activation='sigmoid'))
         model.add(Dropout(0.2))
 
-        model.add(Dense(4, activation='softmax'))
+        model.add(Dense(4, activation='sigmoid'))
 
         self.model = model
