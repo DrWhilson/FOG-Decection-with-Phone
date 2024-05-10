@@ -1,5 +1,6 @@
 from getDB import get_train_data
-from getDB import get_tr_val_tst_data
+from getDB import group_split
+from window_generator import WindowGenerator
 
 import numpy as np
 import tensorflow as tf
@@ -11,22 +12,27 @@ features = ['Time', 'AccV', 'AccML', 'AccAP']
 acc_measures = ['AccV', 'AccML', 'AccAP']
 
 all_features, all_train_data = get_train_data(targets, features, acc_measures)
-X_train, X_test, y_train, y_test = get_tr_val_tst_data(all_train_data, all_features, lookback, targets)
 
 # Create model
-lstmmodel = tf.keras.models.load_model('lstmmodel.keras')
+lstm_model = tf.keras.models.load_model('lstm_model.keras')
+
+# Initialize constants
+window_input_width = 10
+window_label_width = 1
+window_shift = 0
+epochs = 20
 
 # Test model
 for Id, group in all_train_data.groupby('Id'):
-    df = group.set_index('Time')
-    X = np.hstack([df[all_features].values[0:-2],
-                   df.iloc[1:][all_features].values[0:-1],
-                   df.iloc[2:][all_features].values])
-    X = np.reshape(X, (-1, lookback, len(all_features)))
-    Y = df[targets].values[0:-2]
+    train, val, test = group_split(group)
 
-    scores = lstmmodel.evaluate(X, Y)
-    print("Accuracy: %.2f%%" % (scores[1]*100))
+    individual_window = WindowGenerator(
+        input_width=window_input_width, label_width=window_label_width, shift=window_shift,
+        train_df=train.drop(['Id'], axis=1),
+        val_df=val.drop(['Id'], axis=1),
+        test_df=test.drop(['Id'], axis=1),
+        label_columns=features)
 
-scores = lstmmodel.evaluate(X_test, y_test)
-print("Accuracy: %.2f%%" % (scores[1]*100))
+    print("STEP!")
+    val_performance = lstm_model.evaluate(individual_window.val, return_dict=True)
+    performance = lstm_model.evaluate(individual_window.test, verbose=0, return_dict=True)
