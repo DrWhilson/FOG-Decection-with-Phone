@@ -7,7 +7,7 @@ import tensorflow as tf
 
 
 class LSTMModel:
-    model = Sequential()
+    model = tf.keras.Sequential()
 
     def __init__(self, wide_window, features, batch_size=32):
         tf.config.run_functions_eagerly(True)
@@ -17,7 +17,7 @@ class LSTMModel:
         for inputs, targets in wide_window.train.take(1):
             input_shape = inputs.shape[1:]
 
-        model = Sequential(name='Prediction_Gait')
+        model = tf.keras.Sequential(name='Prediction_Gait')
         model.add(LSTM(80, input_shape=input_shape, return_sequences=True))
 
         model.add(LSTM(128, activation='relu'))

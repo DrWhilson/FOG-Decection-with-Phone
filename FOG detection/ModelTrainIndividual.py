@@ -64,4 +64,4 @@ for Id, group in all_train_data.groupby('Id'):
                          validation_data=individual_window.val)
 
 # Save model
-lstm_model.model.save('lstm_model.keras')
+lstm_model.model.save('lstm_model_new.keras')
