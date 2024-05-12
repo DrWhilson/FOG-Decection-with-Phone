@@ -5,7 +5,7 @@ from tensorflow.keras.layers import Dense, Dropout, Conv1D, Flatten, LSTM
 
 class LSTMModel(tf.keras.Model):
     def __init__(self, wide_window, features, batch_size=32):
-        super().__init__()
+        super(LSTMModel, self).__init__()
         tf.config.run_functions_eagerly(True)
 
         input_shape = None
