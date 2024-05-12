@@ -81,4 +81,8 @@ for Id, group in all_train_data.groupby('Id'):
 
 # Save model
 lstm_model.model.save('lstm_model_TEST.keras')
-tf.saved_model.save(lstm_model, "/Models/Model")
+converter = tf.lite.TFLiteConverter.from_keras_model(lstm_model.model)
+tflite_model = converter.convert()
+
+with open('lstm_model.tflite', 'wb') as f:
+    f.write(tflite_model)
