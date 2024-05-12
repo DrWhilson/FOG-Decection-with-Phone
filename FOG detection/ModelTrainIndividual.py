@@ -58,8 +58,8 @@ characteristic_window = WindowGenerator(
 
 # Create model
 lstm_model = LSTMModel(characteristic_window, features, lookback)
-lstm_model.model.compile(loss=losses, optimizer=tf.keras.optimizers.Adam(), metrics=metrics)
-lstm_model.model.summary()
+lstm_model.compile(loss=losses, optimizer=tf.keras.optimizers.Adam(), metrics=metrics)
+lstm_model.summary()
 
 # Train model individual
 for Id, group in all_train_data.groupby('Id'):
@@ -75,15 +75,14 @@ for Id, group in all_train_data.groupby('Id'):
         test_df=test.drop(['Id'], axis=1),
         label_columns=features)
 
-    lstm_model.model.fit(individual_window.train, epochs=epochs,
+    lstm_model.fit(individual_window.train, epochs=epochs,
                          validation_data=individual_window.val)
     break
 
 # Save model
-lstm_model.model.save('lstm_model_TEST.keras')
-converter = tf.lite.TFLiteConverter.from_keras_model(lstm_model.model)
+lstm_model.save('lstm_model_TEST.keras')
+converter = tf.lite.TFLiteConverter.from_keras_model(lstm_model)
 tflite_model = converter.convert()
 
 with open('lstm_model.tflite', 'wb') as f:
     f.write(tflite_model)
-
