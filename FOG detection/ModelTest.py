@@ -14,7 +14,7 @@ acc_measures = ['AccV', 'AccML', 'AccAP']
 all_features, all_train_data = get_train_data(targets, features, acc_measures)
 
 # Create model
-lstm_model = tf.keras.models.load_model('lstm_model.keras')
+lstm_model = tf.keras.models.load_model('/Models/lstm_model.keras')
 
 # Initialize constants
 window_input_width = 10
