@@ -1,13 +1,28 @@
 from ModelDesc import LSTMModel
 from getDB import get_train_data
-from getDB import get_tr_val_tst_data
 from getDB import group_split
 from window_generator import WindowGenerator
 
 import tensorflow as tf
-from keras.metrics import CategoricalAccuracy, Precision, Recall, F1Score
-from keras.losses import CategoricalCrossentropy
-from keras.optimizers import Adam
+from tensorflow.keras import backend as K
+
+
+def F1_score(y_true, y_pred):
+    def recall(y_true, y_pred):
+        true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
+        possible_positives = K.sum(K.round(K.clip(y_true, 0, 1)))
+        recall = true_positives / (possible_positives + K.epsilon())
+        return recall
+
+    def precision(y_true, y_pred):
+        true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
+        predicted_positives = K.sum(K.round(K.clip(y_pred, 0, 1)))
+        precision = true_positives / (predicted_positives + K.epsilon())
+        return precision
+
+    precision = precision(y_true, y_pred)
+    recall = recall(y_true, y_pred)
+    return 2*((precision*recall)/(precision+recall+K.epsilon()))
 
 
 # Load DB
@@ -31,7 +46,7 @@ window_label_width = 1
 window_shift = 0
 epochs = 20
 losses = ['binary_crossentropy']
-metrics = [F1Score()]
+metrics = [F1_score]
 
 # Get characteristic window
 characteristic_window = WindowGenerator(
@@ -62,6 +77,8 @@ for Id, group in all_train_data.groupby('Id'):
 
     lstm_model.model.fit(individual_window.train, epochs=epochs,
                          validation_data=individual_window.val)
+    break
 
 # Save model
-lstm_model.model.save('lstm_model_new.keras')
+lstm_model.model.save('lstm_model_TEST.keras')
+tf.saved_model.save(lstm_model, "/Models/Model")

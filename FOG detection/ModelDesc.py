@@ -1,13 +1,10 @@
-from keras import Sequential
-from keras.layers import Dense, Dropout, Conv1D, Flatten, LSTM
-from keras.optimizers import Adam, SGD
-from keras.losses import CategoricalCrossentropy
-from keras.metrics import CategoricalAccuracy, Precision, SparseCategoricalCrossentropy
 import tensorflow as tf
+from tensorflow.keras import Sequential
+from tensorflow.keras.layers import Dense, Dropout, Conv1D, Flatten, LSTM
 
 
 class LSTMModel:
-    model = tf.keras.Sequential()
+    model = Sequential()
 
     def __init__(self, wide_window, features, batch_size=32):
         tf.config.run_functions_eagerly(True)
@@ -17,7 +14,7 @@ class LSTMModel:
         for inputs, targets in wide_window.train.take(1):
             input_shape = inputs.shape[1:]
 
-        model = tf.keras.Sequential(name='Prediction_Gait')
+        model = Sequential(name='Prediction_Gait')
         model.add(LSTM(80, input_shape=input_shape, return_sequences=True))
 
         model.add(LSTM(128, activation='relu'))
