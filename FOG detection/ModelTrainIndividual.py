@@ -80,5 +80,5 @@ for Id, group in all_train_data.groupby('Id'):
     break
 
 # Save model
-lstm_model.model.save('/Models/lstm_model_TEST.keras')
+lstm_model.model.save('lstm_model_TEST.keras')
 tf.saved_model.save(lstm_model, "/Models/Model")
