@@ -1,7 +1,7 @@
 ﻿./FOG detection/.idea
 ./FOG detection/.venv
 ./DATA
-./FOG detection/*.keras
+./FOG detection/Models
 
 ./FOG mobile/*.iml
 ./FOG mobile/.gradle
