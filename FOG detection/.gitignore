@@ -1,4 +1,4 @@
 ﻿.idea
 .venv
-env
+env/
 Models
