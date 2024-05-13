@@ -7,6 +7,7 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.media.MediaPlayer
+import android.os.Handler
 import android.os.IBinder
 import android.provider.Settings
 import java.sql.Time
@@ -16,16 +17,50 @@ import java.nio.MappedByteBuffer
 import java.nio.channels.FileChannel
 import java.io.FileInputStream
 
-class TFLiteModel(private val context: Context) {
-    private lateinit var tflite: Interpreter
+class MyService: android.app.Service() {
+    private lateinit var sManager: SensorManager
 
-    init {
-        val model = loadModelFile("model.tflite")
-        tflite = Interpreter(model)
+    private lateinit var tflite: Interpreter
+    private var accelerometerData = mutableListOf<FloatArray>()
+    private lateinit var handler: Handler
+    private var timeStep = 0
+
+    val sListener = object : SensorEventListener{
+        override fun onSensorChanged(event: SensorEvent?) {
+            event?.values?.let { values ->
+                // Collect data with a timestamp
+                val currentTime = timeStep * 10
+                val dataEntry = floatArrayOf(currentTime.toFloat(), values[0], values[1], values[2])
+                accelerometerData.add(dataEntry)
+                timeStep++
+            }
+        }
+
+        override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) { }
+    }
+
+    override fun onStartCommand(init:Intent, flag:Int, stratid:Int): Int {
+        sManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        val sensor = sManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+
+        tflite = Interpreter(loadModelFile("model.tflite"))
+        handler = Handler()
+
+        // Register Sensor
+        sManager.registerListener(sListener, sensor, 100000)
+
+        // Stop collecting data after 1 second and process it
+        handler.postDelayed({
+//            sManager.unregisterListener(sListener)
+            processSensorData()
+            timeStep = 0 // Reset time step for the next data collection cycle
+        }, 1000)
+
+        return START_STICKY
     }
 
     private fun loadModelFile(modelName: String): MappedByteBuffer {
-        val fileDescriptor = context.assets.openFd(modelName)
+        val fileDescriptor = assets.openFd(modelName)
         val inputStream = FileInputStream(fileDescriptor.fileDescriptor)
         val fileChannel = inputStream.channel
         val startOffset = fileDescriptor.startOffset
@@ -33,49 +68,26 @@ class TFLiteModel(private val context: Context) {
         return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength)
     }
 
-    fun predict(input: FloatArray): FloatArray {
-        val inputBuffer = arrayOf(input)
-        val outputBuffer = Array(1) { FloatArray(1) }
-        tflite.run(inputBuffer, outputBuffer)
-        return outputBuffer[0]
+    private fun processSensorData() {
+        // Convert list to array for the model
+        val data = Array(accelerometerData.size) { i -> accelerometerData[i] }
+        val output = Array(1) { FloatArray(1) }  // Adjust output size based on the model's output
+        tflite.run(data, output)
+        // Handle output
+        handleModelOutput(output[0])
     }
-}
 
-
-class MyService: android.app.Service() {
-    private lateinit var player:MediaPlayer;
-    private lateinit var sManager: SensorManager
-
-    override fun onStartCommand(init:Intent, flag:Int, stratid:Int): Int {
-        sManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
-        val sensor = sManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
-        val sListener = object : SensorEventListener{
-            override fun onSensorChanged(event: SensorEvent?) {
-                // Get Data from ACCELEROMETER
-                val value = event?.values
-                val sData = "X: ${value?.get(0)} Y: ${value?.get(1)} Z: ${value?.get(2)}"
-            }
-
-            override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-
-            }
-        }
-        // Register Sensor
-        sManager.registerListener(sListener, sensor, SensorManager.SENSOR_DELAY_NORMAL)
-
-//        player =MediaPlayer.create(this,Settings.System.DEFAULT_RINGTONE_URI)
-//        player.setLooping(true)
-//        player.start()
-        return START_STICKY
+    private fun handleModelOutput(output: FloatArray) {
+        // Implement based on what the output represents
+        println("Model output: ${output.contentToString()}")
     }
 
     override fun onDestroy() {
         super.onDestroy()
-//        player.stop()
+        sManager.unregisterListener(sListener)
     }
 
     override fun onBind(intent: Intent?): IBinder? {
         return null
     }
-
 }
