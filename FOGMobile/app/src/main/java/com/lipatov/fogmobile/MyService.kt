@@ -11,6 +11,37 @@ import android.os.IBinder
 import android.provider.Settings
 import java.sql.Time
 
+import org.tensorflow.lite.Interpreter
+import java.nio.MappedByteBuffer
+import java.nio.channels.FileChannel
+import java.io.FileInputStream
+
+class TFLiteModel(private val context: Context) {
+    private lateinit var tflite: Interpreter
+
+    init {
+        val model = loadModelFile("model.tflite")
+        tflite = Interpreter(model)
+    }
+
+    private fun loadModelFile(modelName: String): MappedByteBuffer {
+        val fileDescriptor = context.assets.openFd(modelName)
+        val inputStream = FileInputStream(fileDescriptor.fileDescriptor)
+        val fileChannel = inputStream.channel
+        val startOffset = fileDescriptor.startOffset
+        val declaredLength = fileDescriptor.declaredLength
+        return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength)
+    }
+
+    fun predict(input: FloatArray): FloatArray {
+        val inputBuffer = arrayOf(input)
+        val outputBuffer = Array(1) { FloatArray(1) }
+        tflite.run(inputBuffer, outputBuffer)
+        return outputBuffer[0]
+    }
+}
+
+
 class MyService: android.app.Service() {
     private lateinit var player:MediaPlayer;
     private lateinit var sManager: SensorManager
