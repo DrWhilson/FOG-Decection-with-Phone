@@ -1,6 +1,6 @@
 ﻿./FOG detection/.idea
 ./FOG detection/.venv
-./FOG detection/env
+./FOG detection/env/
 ./DATA
 ./FOG detection/Models
 
