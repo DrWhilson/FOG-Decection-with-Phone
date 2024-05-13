@@ -58,8 +58,8 @@ characteristic_window = WindowGenerator(
 
 # Create model
 lstm_model = LSTMModel(characteristic_window, features, lookback)
-lstm_model.compile(loss=losses, optimizer=tf.keras.optimizers.Adam(), metrics=metrics)
-lstm_model.summary()
+lstm_model.model.compile(loss=losses, optimizer=tf.keras.optimizers.Adam(), metrics=metrics)
+lstm_model.model.summary()
 
 # Train model individual
 for Id, group in all_train_data.groupby('Id'):
@@ -75,14 +75,33 @@ for Id, group in all_train_data.groupby('Id'):
         test_df=test.drop(['Id'], axis=1),
         label_columns=features)
 
-    lstm_model.fit(individual_window.train, epochs=epochs,
+    lstm_model.model.fit(individual_window.train, epochs=epochs,
                          validation_data=individual_window.val)
-    break
 
 # Save model
-lstm_model.save('lstm_model_TEST.keras')
-converter = tf.lite.TFLiteConverter.from_keras_model(lstm_model)
+lstm_model.model.save('lstm_model_TEST.keras')
+
+# Convert the model.
+run_model = tf.function(lambda x: lstm_model.model(x))
+
+BATCH_SIZE = 1
+STEPS = 10
+INPUT_SIZE = 5
+
+concrete_func = run_model.get_concrete_function(
+    tf.TensorSpec([BATCH_SIZE, STEPS, INPUT_SIZE], lstm_model.model.inputs[0].dtype))
+
+converter = tf.lite.TFLiteConverter.from_keras_model(lstm_model.model)
+
+converter.optimizations = [tf.lite.Optimize.DEFAULT]
+converter.target_spec.supported_ops = [
+    tf.lite.OpsSet.TFLITE_BUILTINS,
+    tf.lite.OpsSet.SELECT_TF_OPS
+]
+converter.experimental_new_converter = True
+
 tflite_model = converter.convert()
 
-with open('lstm_model.tflite', 'wb') as f:
+# Save the model.
+with open('model.tflite', 'wb') as f:
     f.write(tflite_model)
