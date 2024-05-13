@@ -21,9 +21,11 @@ class MainActivity : AppCompatActivity() {
             MainSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
                 if(isChecked) {
                     startService(Intent(this@MainActivity,MyService::class.java))
+                    MainSwitch.text = getString(R.string.switch_on_text);
                     println("Standard Switch is on")
                 } else {
                     stopService(Intent(this@MainActivity,MyService::class.java))
+                    MainSwitch.text = getString(R.string.switch_off_text);
                     println("Standard Switch is off")
                 }
             }
