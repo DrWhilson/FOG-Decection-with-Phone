@@ -8,6 +8,15 @@ import tensorflow as tf
 
 print(tf.__version__)
 
+def find_median(nums):
+    sorted_nums = sorted(nums)
+    n = len(sorted_nums)
+    if n % 2 == 0:
+        median = (sorted_nums[n//2 - 1] + sorted_nums[n//2]) / 2
+    else:
+        median = sorted_nums[n//2]
+    return median
+
 def F1_score(y_true, y_pred):
     def recall(y_true, y_pred):
         true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
@@ -52,11 +61,11 @@ for Id, group in all_train_data.groupby('Id'):
     train, val, test = group_split(group)
 
     individual_window = WindowGenerator(
-        input_width=window_input_width, label_width=window_label_width, shift=window_shift,
-        train_df=train.drop(['Id'], axis=1),
-        val_df=val.drop(['Id'], axis=1),
-        test_df=test.drop(['Id'], axis=1),
-        label_columns=features)
+            input_width=window_input_width, label_width=window_label_width, shift=window_shift,
+            train_df=train.drop(['Id'], axis=1),
+            val_df=val.drop(['Id'], axis=1),
+            test_df=test.drop(['Id'], axis=1),
+            label_columns=features)
 
     print("STEP!")
     _, fscore = lstm_model.evaluate(individual_window.test)
@@ -67,3 +76,6 @@ print("===SCORE===")
 
 for score in fscorelist:
     print("F1Score: ", score)
+
+print("Average score:", sum(fscorelist) / len(fscorelist))
+print("Median score:", find_median(fscorelist))
