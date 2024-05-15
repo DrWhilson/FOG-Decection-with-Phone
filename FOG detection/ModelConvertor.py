@@ -46,5 +46,5 @@ converter.experimental_new_converter = True
 tflite_model = converter.convert()
 
 # Save the model.
-with open('model.tflite', 'wb') as f:
+with open('model_LSTM.tflite', 'wb') as f:
     f.write(tflite_model)
