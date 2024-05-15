@@ -20,18 +20,15 @@ class MainActivity : AppCompatActivity() {
 
         // val model = ModelLstm.newInstance(this)
 
-//        binding.apply {
-//            MainSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
-//                if(isChecked) {
-//                    println("Standard Switch is on")
-//                    startService(Intent(this@MainActivity,MyService::class.java))
-//                    MainSwitch.text = getString(R.string.switch_on_text);
-//                } else {
-//                    println("Standard Switch is off")
-//                    stopService(Intent(this@MainActivity,MyService::class.java))
-//                    MainSwitch.text = getString(R.string.switch_off_text);
-//                }
-//            }
-//        }
+        binding.apply {
+            button0N.setOnClickListener {
+                println("Click is on")
+                startService(Intent(this@MainActivity,MyService::class.java))
+            }
+            buttonOff.setOnClickListener {
+                println("Click is off")
+                stopService(Intent(this@MainActivity,MyService::class.java))
+            }
+        }
     }
 }
