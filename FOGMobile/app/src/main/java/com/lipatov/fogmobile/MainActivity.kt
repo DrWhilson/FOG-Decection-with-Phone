@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.inputmethod.InputBinding
 import com.lipatov.fogmobile.databinding.ActivityMainBinding
+import com.lipatov.fogmobile.ml.ModelLstm
 
 class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
@@ -17,18 +18,20 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(binding.root)
 
-        binding.apply {
-            MainSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
-                if(isChecked) {
-                    startService(Intent(this@MainActivity,MyService::class.java))
-                    MainSwitch.text = getString(R.string.switch_on_text);
-                    println("Standard Switch is on")
-                } else {
-                    stopService(Intent(this@MainActivity,MyService::class.java))
-                    MainSwitch.text = getString(R.string.switch_off_text);
-                    println("Standard Switch is off")
-                }
-            }
-        }
+        // val model = ModelLstm.newInstance(this)
+
+//        binding.apply {
+//            MainSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
+//                if(isChecked) {
+//                    println("Standard Switch is on")
+//                    startService(Intent(this@MainActivity,MyService::class.java))
+//                    MainSwitch.text = getString(R.string.switch_on_text);
+//                } else {
+//                    println("Standard Switch is off")
+//                    stopService(Intent(this@MainActivity,MyService::class.java))
+//                    MainSwitch.text = getString(R.string.switch_off_text);
+//                }
+//            }
+//        }
     }
 }
