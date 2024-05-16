@@ -53,6 +53,7 @@ class MyService: android.app.Service() {
         // Load Model
         lstmModel = ModelLstm.newInstance(this)
 
+
         // Set ACCELEROMETER
         sManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
         val sensor = sManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
@@ -91,6 +92,23 @@ class MyService: android.app.Service() {
         val outputs = lstmModel.process(inputFeature0)
         val outputFeature0 = outputs.outputFeature0AsTensorBuffer
 
+        if (checkForTrigger(outputFeature0)) {
+            launchNewActivity()
+        }
+    }
+
+    private fun checkForTrigger(outputFeature0: TensorBuffer): Boolean {
+        for (i in 0 until outputFeature0.floatArray.size) {
+            if (outputFeature0.floatArray[i] == 1f) {
+                return true
+            }
+        }
+        return false
+    }
+
+    private fun launchNewActivity() {
+        val intent = Intent(this, AlertActivity::class.java)
+        startActivity(intent)
     }
 
     override fun onDestroy() {
