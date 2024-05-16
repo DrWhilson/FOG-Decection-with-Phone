@@ -33,14 +33,14 @@ class ConfigActivity : AppCompatActivity() {
                     editor.apply()
 
                     ChoiseLang("en")
-                    LangInd.setText("Eng")
+                    LangInd.setText(getString(R.string.LangInd))
                 } else {
                     val editor = getSharedPreferences("Settings", MODE_PRIVATE).edit()
                     editor.putBoolean("Lang Button", false)
                     editor.apply()
 
                     ChoiseLang("ru")
-                    LangInd.setText("Рус")
+                    LangInd.setText(getString(R.string.LangInd))
                 }
             }
 

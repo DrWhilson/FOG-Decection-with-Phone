@@ -51,9 +51,7 @@ class MyService: android.app.Service() {
         println("Service on!")
 
         // Load Model
-//        lstmModel = ModelLstm.newInstance(this)
-
-        launchNewActivity()
+        lstmModel = ModelLstm.newInstance(this)
 
         // Set ACCELEROMETER
         sManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
@@ -67,7 +65,8 @@ class MyService: android.app.Service() {
 
         // Stop collecting data after 1 second and process it
         handler.postDelayed({
-//            processSensorData()
+            processSensorData()
+//            launchNewActivity()
             accelerometerData.clear()
             timeStep = 0
         }, 1000)
