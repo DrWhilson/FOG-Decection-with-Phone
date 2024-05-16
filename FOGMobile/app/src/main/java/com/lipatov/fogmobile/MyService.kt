@@ -38,7 +38,7 @@ class MyService: android.app.Service() {
                 // Collect data with a timestamp
                 val currentTime = timeStep * 10
                 val dataEntry = floatArrayOf(currentTime.toFloat(), values[0], values[1], values[2])
-                println("X:" + values[0] + " Y:" + values[1] + " Z:" + values[2])
+//                println("X:" + values[0] + " Y:" + values[1] + " Z:" + values[2])
                 accelerometerData.add(dataEntry)
                 timeStep++
             }

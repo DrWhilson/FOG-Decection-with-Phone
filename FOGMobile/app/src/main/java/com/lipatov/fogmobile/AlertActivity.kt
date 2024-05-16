@@ -11,6 +11,7 @@ import android.os.Vibrator
 import android.os.VibratorManager
 import android.widget.Button
 import android.widget.Toast
+import androidx.core.content.getSystemService
 import java.lang.Exception
 
 class AlertActivity : AppCompatActivity() {
@@ -24,14 +25,7 @@ class AlertActivity : AppCompatActivity() {
         println("Alert!")
         ringtone = RingtoneManager.getRingtone(this, RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
 
-        vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            val vibratorManager =
-                getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
-            vibratorManager.defaultVibrator
-        } else {
-            @Suppress("DEPRECATION")
-            getSystemService(VIBRATOR_SERVICE) as Vibrator
-        }
+        vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
 
         val stopButton = findViewById<Button>(R.id.StopButton)
         stopButton.setOnClickListener {
@@ -41,14 +35,20 @@ class AlertActivity : AppCompatActivity() {
             finish()
         }
 
+        val sharedPrefs = getSharedPreferences("Settings", MODE_PRIVATE)
 
-        println("Play!")
-        playRingtone()
-        startVibration()
+        if(sharedPrefs.getBoolean("Sound Button", true)){
+            playRingtone()
+        }
+
+        if(sharedPrefs.getBoolean("Vibration Button", true)) {
+            startVibration()
+        }
     }
 
     private fun playRingtone() {
         try {
+            println("Play!")
             ringtone.play()
         } catch (e: Exception) {
             Toast.makeText(applicationContext, this.getString(R.string.Error), Toast.LENGTH_SHORT).show()
@@ -56,10 +56,16 @@ class AlertActivity : AppCompatActivity() {
     }
 
     private fun startVibration() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            vibrator.vibrate(VibrationEffect.createOneShot(2000, VibrationEffect.DEFAULT_AMPLITUDE))
-        } else {
-            vibrator.vibrate(2000)
+        try {
+            if (Build.VERSION.SDK_INT >= 26) {
+                println("Vibrate1!")
+                vibrator.vibrate(VibrationEffect.createOneShot(2000, VibrationEffect.DEFAULT_AMPLITUDE))
+            } else {
+                println("Vibrate2!")
+                vibrator.vibrate(2000)
+            }
+        } catch (e: Exception) {
+            Toast.makeText(applicationContext, this.getString(R.string.Error), Toast.LENGTH_SHORT).show()
         }
     }
 

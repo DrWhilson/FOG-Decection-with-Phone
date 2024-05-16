@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">FOG Mobile</string>
+    <string name="switch_off_text">Вкл.</string>
+    <string name="switch_on_text">Выкл.</string>
+    <string name="Button_off_text">Выкл.</string>
+    <string name="Button_on_text">Вкл.</string>
+    <string name="Button_config">Настройки</string>
+    <string name="Button_DB">Записи</string>
+    <string name="StopAlertButton">Остановить</string>
+    <string name="Error">Произошла ошибка</string>
+    <string name="Exit">Выйти</string>
+    <string name="langCh">Язык</string>
+    <string name="VibPrem">Вибрации</string>
+    <string name="NotifPrem">Звук</string>
+    <string name="LangInd">Рус</string>
+    <string name="RestarMess">Please Restart</string>
+</resources>

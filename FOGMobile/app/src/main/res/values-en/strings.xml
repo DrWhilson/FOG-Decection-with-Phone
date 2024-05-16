@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">FOG Mobile</string>
+    <string name="switch_off_text">On</string>
+    <string name="switch_on_text">Off</string>
+    <string name="Button_off_text">Off</string>
+    <string name="Button_on_text">On</string>
+    <string name="Button_config">Setings</string>
+    <string name="Button_DB">Data</string>
+    <string name="StopAlertButton">Stop</string>
+    <string name="Error">Error occurred</string>
+    <string name="Exit">Exit</string>
+    <string name="langCh">Language</string>
+    <string name="VibPrem">Vibrations</string>
+    <string name="NotifPrem">Sounds</string>
+    <string name="LangInd">Eng</string>
+    <string name="RestarMess">Перезапустите приложение</string>
+</resources>
