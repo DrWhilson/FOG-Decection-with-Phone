@@ -51,8 +51,9 @@ class MyService: android.app.Service() {
         println("Service on!")
 
         // Load Model
-        lstmModel = ModelLstm.newInstance(this)
+//        lstmModel = ModelLstm.newInstance(this)
 
+        launchNewActivity()
 
         // Set ACCELEROMETER
         sManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
@@ -66,7 +67,7 @@ class MyService: android.app.Service() {
 
         // Stop collecting data after 1 second and process it
         handler.postDelayed({
-            processSensorData()
+//            processSensorData()
             accelerometerData.clear()
             timeStep = 0
         }, 1000)
@@ -108,6 +109,8 @@ class MyService: android.app.Service() {
 
     private fun launchNewActivity() {
         val intent = Intent(this, AlertActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        println("Try To Create Error!")
         startActivity(intent)
     }
 
