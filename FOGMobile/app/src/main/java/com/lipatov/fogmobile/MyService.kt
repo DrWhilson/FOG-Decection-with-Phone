@@ -9,6 +9,7 @@ import android.hardware.SensorManager
 import android.os.Handler
 import android.os.IBinder
 import android.provider.Settings
+import com.lipatov.fogmobile.ml.ModelLstm
 import java.sql.Time
 
 import java.nio.MappedByteBuffer
@@ -32,6 +33,9 @@ class MyService: android.app.Service() {
                 // Collect data with a timestamp
                 val currentTime = timeStep * 10
                 val dataEntry = floatArrayOf(currentTime.toFloat(), values[0], values[1], values[2])
+                println("X:" + values[0])
+                println("Y:" + values[1])
+                println("Z:" + values[2])
                 accelerometerData.add(dataEntry)
                 timeStep++
             }
@@ -41,6 +45,11 @@ class MyService: android.app.Service() {
     }
 
     override fun onStartCommand(init:Intent, flag:Int, stratid:Int): Int {
+        println("Service on!")
+
+        // Load Model
+//        val model = ModelLstm.newInstance(this)
+
         // Set ACCELEROMETER
         sManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
         val sensor = sManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
@@ -60,23 +69,10 @@ class MyService: android.app.Service() {
         return START_STICKY
     }
 
-//    private fun processSensorData() {
-//        // Convert list to array for the model
-//        val data = Array(accelerometerData.size) { i -> accelerometerData[i] }
-//        val output = Array(1) { FloatArray(1) }  // Adjust output size based on the model's output
-//        tflite.run(data, output)
-//        // Handle output
-//        handleModelOutput(output[0])
-//    }
-
-    private fun handleModelOutput(output: FloatArray) {
-        // Implement based on what the output represents
-        println("Model output: ${output.contentToString()}")
-    }
-
     override fun onDestroy() {
-        super.onDestroy()
+        println("Service off!")
         sManager.unregisterListener(sListener)
+        super.onDestroy()
     }
 
     override fun onBind(intent: Intent?): IBinder? {

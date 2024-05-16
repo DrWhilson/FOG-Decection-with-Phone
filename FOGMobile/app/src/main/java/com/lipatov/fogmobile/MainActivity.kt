@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.inputmethod.InputBinding
 import com.lipatov.fogmobile.databinding.ActivityMainBinding
-import com.lipatov.fogmobile.ml.ModelLstm
 
 class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
@@ -17,8 +16,6 @@ class MainActivity : AppCompatActivity() {
         binding=ActivityMainBinding.inflate(layoutInflater)
 
         setContentView(binding.root)
-
-        // val model = ModelLstm.newInstance(this)
 
         binding.apply {
             button0N.setOnClickListener {
