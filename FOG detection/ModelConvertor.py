@@ -22,7 +22,11 @@ def F1_score(y_true, y_pred):
     return 2*((precision*recall)/(precision+recall+K.epsilon()))
 
 
-lstm_model = tf.keras.models.load_model('lstm_model_TEST.keras', custom_objects={'F1_score': F1_score})
+lstm_model = tf.keras.models.load_model('lstm_model_test_model.keras', custom_objects={'F1_score': F1_score})
+
+tf.saved_model.save(lstm_model, "/Models/Model")
+
+lstm_model = tf.saved_model.load("/Models/Model")
 
 # Convert the model.
 run_model = tf.function(lambda x: lstm_model(x))

@@ -1,12 +1,14 @@
 from getDB import get_train_data
 from getDB import group_split
+
+import tensorflow as tf
 from window_generator import WindowGenerator
 from tensorflow.keras import backend as K
 
 import numpy as np
-import tensorflow as tf
 
 print(tf.__version__)
+
 
 def find_median(nums):
     sorted_nums = sorted(nums)
@@ -16,6 +18,7 @@ def find_median(nums):
     else:
         median = sorted_nums[n//2]
     return median
+
 
 def F1_score(y_true, y_pred):
     def recall(y_true, y_pred):
