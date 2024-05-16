@@ -20,16 +20,29 @@ class MainActivity : AppCompatActivity() {
         binding=ActivityMainBinding.inflate(layoutInflater)
 
         setContentView(binding.root)
+        val sharedPrefs = getSharedPreferences("Settings", MODE_PRIVATE)
 
         binding.apply {
-            button0N.setOnClickListener {
-                println("Click is on")
-                startService(Intent(this@MainActivity,MyService::class.java))
+            switchState.setChecked(sharedPrefs.getBoolean("State", false))
+
+            switchState.setOnCheckedChangeListener { buttonView, isChecked ->
+                if (isChecked) {
+                    val editor = getSharedPreferences("Settings", MODE_PRIVATE).edit()
+                    editor.putBoolean("State", true)
+                    editor.apply()
+                    println("Click is on")
+                    startService(Intent(this@MainActivity,MyService::class.java))
+                    switchState.setText(getString(R.string.switch_on_text))
+                } else {
+                    val editor = getSharedPreferences("Settings", MODE_PRIVATE).edit()
+                    editor.putBoolean("State", false)
+                    editor.apply()
+                    println("Click is off")
+                    stopService(Intent(this@MainActivity,MyService::class.java))
+                    switchState.setText(getString(R.string.switch_off_text))
+                }
             }
-            buttonOff.setOnClickListener {
-                println("Click is off")
-                stopService(Intent(this@MainActivity,MyService::class.java))
-            }
+
             buttonExit.setOnClickListener {
                 println("Click is exit")
                 finish()
