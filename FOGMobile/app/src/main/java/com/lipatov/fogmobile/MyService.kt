@@ -10,11 +10,14 @@ import android.os.Handler
 import android.os.IBinder
 import android.provider.Settings
 import com.lipatov.fogmobile.ml.ModelLstm
+import org.tensorflow.lite.DataType
+import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
 import java.sql.Time
 
 import java.nio.MappedByteBuffer
 import java.nio.channels.FileChannel
 import java.io.FileInputStream
+import java.nio.ByteBuffer
 
 
 class MyService: android.app.Service() {
@@ -63,6 +66,7 @@ class MyService: android.app.Service() {
         // Stop collecting data after 1 second and process it
         handler.postDelayed({
             processSensorData()
+            accelerometerData.clear()
             timeStep = 0
         }, 1000)
 
@@ -70,9 +74,23 @@ class MyService: android.app.Service() {
     }
 
     private fun processSensorData() {
-        // Processing the data with the LSTM model
-        println("Processing data...")
-        // Example: lstmModel.predict(accelerometerData)
+        println("Processing data")
+
+        val inputFeature0 = TensorBuffer.createFixedSize(intArrayOf(1, accelerometerData.size, 4), DataType.FLOAT32)
+
+        val buffer = ByteBuffer.allocateDirect(accelerometerData.size * 4 * Float.SIZE_BYTES)  // 4 * number of floats in one entry (time + x + y + z)
+        val floatBuffer = buffer.asFloatBuffer()
+        accelerometerData.forEach { array ->
+            floatBuffer.put(array)
+        }
+        floatBuffer.rewind()  // Rewind the buffer to be read from the beginning
+
+        inputFeature0.loadBuffer(buffer)
+
+        // Process the data through the model
+        val outputs = lstmModel.process(inputFeature0)
+        val outputFeature0 = outputs.outputFeature0AsTensorBuffer
+
     }
 
     override fun onDestroy() {
