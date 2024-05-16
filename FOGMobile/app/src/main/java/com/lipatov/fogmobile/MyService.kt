@@ -25,6 +25,8 @@ class MyService: android.app.Service() {
     private lateinit var handler: Handler
     private var timeStep = 0
 
+    // LSTM Model
+    private lateinit var lstmModel: ModelLstm
 
     // Listen a ACCELEROMETER
     val sListener = object : SensorEventListener {
@@ -33,9 +35,7 @@ class MyService: android.app.Service() {
                 // Collect data with a timestamp
                 val currentTime = timeStep * 10
                 val dataEntry = floatArrayOf(currentTime.toFloat(), values[0], values[1], values[2])
-                println("X:" + values[0])
-                println("Y:" + values[1])
-                println("Z:" + values[2])
+                println("X:" + values[0] + " Y:" + values[1] + " Z:" + values[2])
                 accelerometerData.add(dataEntry)
                 timeStep++
             }
@@ -48,7 +48,7 @@ class MyService: android.app.Service() {
         println("Service on!")
 
         // Load Model
-//        val model = ModelLstm.newInstance(this)
+        lstmModel = ModelLstm.newInstance(this)
 
         // Set ACCELEROMETER
         sManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
@@ -62,15 +62,22 @@ class MyService: android.app.Service() {
 
         // Stop collecting data after 1 second and process it
         handler.postDelayed({
-            //processSensorData()
+            processSensorData()
             timeStep = 0
         }, 1000)
 
         return START_STICKY
     }
 
+    private fun processSensorData() {
+        // Processing the data with the LSTM model
+        println("Processing data...")
+        // Example: lstmModel.predict(accelerometerData)
+    }
+
     override fun onDestroy() {
         println("Service off!")
+        lstmModel.close()
         sManager.unregisterListener(sListener)
         super.onDestroy()
     }
