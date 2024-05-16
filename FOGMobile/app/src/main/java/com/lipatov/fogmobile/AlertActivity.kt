@@ -1,6 +1,7 @@
 package com.lipatov.fogmobile
 
 import android.content.Context
+import android.media.Ringtone
 import android.media.RingtoneManager
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
@@ -9,15 +10,19 @@ import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
 import android.widget.Button
+import android.widget.Toast
+import java.lang.Exception
 
 class AlertActivity : AppCompatActivity() {
-
-    private var ringtone = RingtoneManager.getRingtone(this, RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE))
+    private lateinit var ringtone: Ringtone
     private lateinit var vibrator: Vibrator
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_alert)
+
+        println("Alert!")
+        ringtone = RingtoneManager.getRingtone(this, RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
 
         vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             val vibratorManager =
@@ -30,18 +35,23 @@ class AlertActivity : AppCompatActivity() {
 
         val stopButton = findViewById<Button>(R.id.StopButton)
         stopButton.setOnClickListener {
+            println("Alert Stop!")
             ringtone.stop()
             vibrator.cancel()
             finish()
         }
 
+
+        println("Play!")
         playRingtone()
         startVibration()
     }
 
     private fun playRingtone() {
-        if (ringtone != null && !ringtone.isPlaying) {
+        try {
             ringtone.play()
+        } catch (e: Exception) {
+            Toast.makeText(applicationContext, this.getString(R.string.Error), Toast.LENGTH_SHORT).show()
         }
     }
 
