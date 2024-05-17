@@ -33,7 +33,7 @@ acc_measures = ['AccV', 'AccML', 'AccAP']
 
 all_features, all_train_data = get_train_data(targets, features, acc_measures)
 
-# Пet the first patient's data
+# Get the first patient's data
 ids = all_train_data['Id'].unique()
 characteristic_group = all_train_data[all_train_data['Id'] == ids[0]]
 
