@@ -36,7 +36,7 @@ class AlertActivity : AppCompatActivity() {
         }
 
         val sharedPrefs = getSharedPreferences("Settings", MODE_PRIVATE)
-
+        println("Sound " + sharedPrefs.getBoolean("Sound Button", true))
         if(sharedPrefs.getBoolean("Sound Button", true)){
             playRingtone()
         }
@@ -71,12 +71,12 @@ class AlertActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        ringtone.stop()
+//        ringtone.stop()
     }
 
     override fun onResume() {
         super.onResume()
-        playRingtone()
+//        playRingtone()
     }
 
     override fun onDestroy() {
