@@ -69,12 +69,14 @@ characteristic_window = WindowGenerator(
     train_df=train.drop(['Id'], axis=1),
     val_df=val.drop(['Id'], axis=1),
     test_df=test.drop(['Id'], axis=1),
-    label_columns=features)
+    label_columns=targets)
+
+print("Create Window!")
 
 # Create model
 input_shape = None
 
-for inputs, targets in characteristic_window.train.take(1):
+for inputs, _ in characteristic_window.train.take(1):
     input_shape = inputs.shape[1:]
 
 lstm_model = tf.keras.Sequential([
@@ -84,10 +86,11 @@ lstm_model = tf.keras.Sequential([
                             tf.keras.layers.Dense(64, activation='relu'),
                             tf.keras.layers.Dense(32, activation='relu'),
                             tf.keras.layers.Dense(10, activation='sigmoid'),
-                            tf.keras.layers.Dense(4, activation='sigmoid')
+                            tf.keras.layers.Dense(1, activation='sigmoid')
                             ])
 
 lstm_model.compile(loss=losses, optimizer=tf.keras.optimizers.Adam(), metrics=metrics)
+print("Create Model")
 
 # Train model individual
 for Id, group in all_train_data.groupby('Id'):
@@ -101,38 +104,8 @@ for Id, group in all_train_data.groupby('Id'):
         train_df=train.drop(['Id'], axis=1),
         val_df=val.drop(['Id'], axis=1),
         test_df=test.drop(['Id'], axis=1),
-        label_columns=features)
+        label_columns=targets)
 
     lstm_model.fit(individual_window.train, epochs=epochs,
                    validation_data=individual_window.val)
     break
-
-# Save model
-tf.saved_model.save(lstm_model, "/Models/Model")
-
-convert_model = tf.saved_model.load("/Models/Model")
-
-# Convert the model.
-run_model = tf.function(lambda x: convert_model(x))
-
-BATCH_SIZE = 1
-STEPS = 10
-INPUT_SIZE = 5
-
-concrete_func = run_model.get_concrete_function(
-    tf.TensorSpec([BATCH_SIZE, STEPS, INPUT_SIZE], convert_model.inputs[0].dtype))
-
-converter = tf.lite.TFLiteConverter.from_saved_model("/Models/Model")
-
-converter.optimizations = [tf.lite.Optimize.DEFAULT]
-converter.target_spec.supported_ops = [
-    tf.lite.OpsSet.TFLITE_BUILTINS,
-    tf.lite.OpsSet.SELECT_TF_OPS
-]
-converter.experimental_new_converter = True
-
-tflite_model = converter.convert()
-
-# Save the model.
-with open('model_TEST.tflite', 'wb') as f:
-    f.write(tflite_model)
