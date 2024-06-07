@@ -131,10 +131,25 @@ for Id, group in all_train_data.groupby('Id'):
     break
 
 # Convert the model.
+run_model = tf.function(lambda x: lstm_model(x))
+# This is important, let's fix the input size.
+BATCH_SIZE = 1
+STEPS = 10
+INPUT_SIZE = 5
+concrete_func = run_model.get_concrete_function(
+    tf.TensorSpec([BATCH_SIZE, STEPS, INPUT_SIZE], lstm_model.inputs[0].dtype))
+
 converter = tf.lite.TFLiteConverter.from_keras_model(lstm_model)
+
+converter.optimizations = [tf.lite.Optimize.DEFAULT]
+converter.target_spec.supported_ops = [
+    tf.lite.OpsSet.TFLITE_BUILTINS,
+    tf.lite.OpsSet.SELECT_TF_OPS
+]
+converter.experimental_new_converter = True
 
 tflite_model = converter.convert()
 
 # Save the model.
-with open('model_LSTM.tflite', 'wb') as f:
+with open('test.tflite', 'wb') as f:
     f.write(tflite_model)

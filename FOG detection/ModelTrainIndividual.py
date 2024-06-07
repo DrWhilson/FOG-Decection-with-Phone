@@ -79,7 +79,7 @@ for Id, group in all_train_data.groupby('Id'):
                          validation_data=individual_window.val)
 
 # Save model
-lstm_model.model.save('lstm_model_least.keras')
+lstm_model.model.save('lstm_least.keras')
 
 # Convert the model.
 run_model = tf.function(lambda x: lstm_model.model(x))
@@ -103,5 +103,5 @@ converter.experimental_new_converter = True
 tflite_model = converter.convert()
 
 # Save the model.
-with open('lite_lstm_model_least.tflite', 'wb') as f:
+with open('lite_lstm_least.tflite', 'wb') as f:
     f.write(tflite_model)
