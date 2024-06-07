@@ -1,8 +1,6 @@
 import tensorflow as tf
-from tensorflow.keras import backend as K
-
 print(tf.__version__)
-
+from tensorflow.keras import backend as K
 
 def F1_score(y_true, y_pred):
     def recall(y_true, y_pred):
