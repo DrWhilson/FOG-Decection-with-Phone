@@ -9,7 +9,7 @@ import android.hardware.SensorManager
 import android.os.Handler
 import android.os.IBinder
 import android.provider.Settings
-import com.lipatov.fogmobile.ml.ModelLstm
+import com.lipatov.fogmobile.ml.TestLstm
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
 import java.sql.Time
@@ -29,7 +29,7 @@ class MyService: android.app.Service() {
     private var timeStep = 0
 
     // LSTM Model
-    private lateinit var lstmModel: ModelLstm
+    private lateinit var lstmModel: TestLstm
 
     // Listen a ACCELEROMETER
     val sListener = object : SensorEventListener {
@@ -38,7 +38,7 @@ class MyService: android.app.Service() {
                 // Collect data with a timestamp
                 val currentTime = timeStep * 10
                 val dataEntry = floatArrayOf(currentTime.toFloat(), values[0], values[1], values[2])
-//                println("X:" + values[0] + " Y:" + values[1] + " Z:" + values[2])
+//                println("X:" + values[0] + " Y:" + values[1] + " Z:" + values[2]) // Debug print
                 accelerometerData.add(dataEntry)
                 timeStep++
             }
@@ -51,7 +51,7 @@ class MyService: android.app.Service() {
         println("Service on!")
 
         // Load Model
-        lstmModel = ModelLstm.newInstance(this)
+        lstmModel = TestLstm.newInstance(this)
 
         // Set ACCELEROMETER
         sManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
@@ -77,7 +77,7 @@ class MyService: android.app.Service() {
     private fun processSensorData() {
         println("Processing data")
 
-        val inputFeature0 = TensorBuffer.createFixedSize(intArrayOf(1, accelerometerData.size, 4), DataType.FLOAT32)
+       val inputFeature0 = TensorBuffer.createFixedSize(intArrayOf(1, accelerometerData.size, 4), DataType.FLOAT32)
 
         val buffer = ByteBuffer.allocateDirect(accelerometerData.size * 4 * Float.SIZE_BYTES)  // 4 * number of floats in one entry (time + x + y + z)
         val floatBuffer = buffer.asFloatBuffer()
@@ -89,22 +89,22 @@ class MyService: android.app.Service() {
         inputFeature0.loadBuffer(buffer)
 
         // Process the data through the model
-        val outputs = lstmModel.process(inputFeature0)
-        val outputFeature0 = outputs.outputFeature0AsTensorBuffer
+         val outputs = lstmModel.process(inputFeature0)
+         val outputFeature0 = outputs.outputFeature0AsTensorBuffer
 
         if (checkForTrigger(outputFeature0)) {
             launchNewActivity()
         }
     }
 
-    private fun checkForTrigger(outputFeature0: TensorBuffer): Boolean {
-        for (i in 0 until outputFeature0.floatArray.size) {
-            if (outputFeature0.floatArray[i] == 1f) {
-                return true
-            }
-        }
-        return false
-    }
+//    private fun checkForTrigger(outputFeature0: TensorBuffer): Boolean {
+//        for (i in 0 until outputFeature0.floatArray.size) {
+//            if (outputFeature0.floatArray[i] == 1f) {
+//                return true
+//            }
+//        }
+//        return false
+//    }
 
     private fun launchNewActivity() {
         val intent = Intent(this, AlertActivity::class.java)

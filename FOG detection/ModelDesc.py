@@ -14,13 +14,9 @@ class LSTMModel(tf.keras.Model):
             input_shape = inputs.shape[1:]
 
         self.model = tf.keras.models.Sequential([
-            tf.keras.layers.LSTM(80, input_shape=input_shape, return_sequences=True),
-            tf.keras.layers.LSTM(128, activation='tanh', return_sequences=False),
-            tf.keras.layers.Dense(80, activation='relu'),
-            tf.keras.layers.Dense(64, activation='relu'),
-            tf.keras.layers.Dense(32, activation='relu'),
-            tf.keras.layers.Dense(10, activation='sigmoid'),
-            tf.keras.layers.Dense(4, activation='sigmoid')
+            tf.keras.layers.LSTM(80, activation='tanh', input_shape=input_shape),
+            tf.keras.layers.Dropout(0.5),
+            tf.keras.layers.Dense(1, activation='sigmoid')
         ])
 
     def call(self, inputs):

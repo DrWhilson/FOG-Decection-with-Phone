@@ -33,61 +33,67 @@ acc_measures = ['AccV', 'AccML', 'AccAP']
 
 all_features, all_train_data = get_train_data(targets, features, acc_measures)
 
-# Get the first patient's data
+# Получаем данные первого пациента
 ids = all_train_data['Id'].unique()
 characteristic_group = all_train_data[all_train_data['Id'] == ids[0]]
 
-# Split first patient's data
+# Разделяем данные на тренеровачные, тестовые и валидационные
 train, val, test = group_split(characteristic_group)
 
-# Initialize constants
+# Создаём константы
 window_input_width = 10
 window_label_width = 1
 window_shift = 0
 epochs = 20
 losses = ['binary_crossentropy']
-metrics = [F1_score]
+metrics = [F1_score, 'precision', 'accuracy']
 
-# Get characteristic window
+# Создаём окно данных
 characteristic_window = WindowGenerator(
     input_width=window_input_width, label_width=window_label_width, shift=window_shift,
     train_df=train.drop(['Id'], axis=1),
     val_df=val.drop(['Id'], axis=1),
     test_df=test.drop(['Id'], axis=1),
-    label_columns=features)
+    label_columns=targets)
 
-# Create model
+# Создаём модель
 lstm_model = LSTMModel(characteristic_window, features, lookback)
 lstm_model.model.compile(loss=losses, optimizer=tf.keras.optimizers.Adam(), metrics=metrics)
 lstm_model.model.summary()
 
-# Train model individual
+# Обучаем модель
 for Id, group in all_train_data.groupby('Id'):
+    # Разделяем данные на тренеровачные, тестовые и валидационные
     train, val, test = group_split(group)
+
+    if len(train['Event'].unique()) == 1:
+        continue
 
     print("!Len: ", len(train))
     print("!Events:", train['Event'].value_counts())
 
+    # Создаём окно данных
     individual_window = WindowGenerator(
         input_width=window_input_width, label_width=window_label_width, shift=window_shift,
         train_df=train.drop(['Id'], axis=1),
         val_df=val.drop(['Id'], axis=1),
         test_df=test.drop(['Id'], axis=1),
-        label_columns=features)
+        label_columns=targets)
 
+    # Дообучаем модель
     lstm_model.model.fit(individual_window.train, epochs=epochs,
                          validation_data=individual_window.val)
+    break
 
 # Save model
 lstm_model.model.save('lstm_least.keras')
 
 # Convert the model.
 run_model = tf.function(lambda x: lstm_model.model(x))
-
+# This is important, let's fix the input size.
 BATCH_SIZE = 1
 STEPS = 10
 INPUT_SIZE = 5
-
 concrete_func = run_model.get_concrete_function(
     tf.TensorSpec([BATCH_SIZE, STEPS, INPUT_SIZE], lstm_model.model.inputs[0].dtype))
 

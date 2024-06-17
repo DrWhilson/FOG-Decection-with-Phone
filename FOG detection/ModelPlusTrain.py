@@ -7,6 +7,7 @@ from tensorflow.keras import Metric
 import tensorflow.keras as keras
 from tensorflow.keras import backend as K
 
+print(tf.__version__)
 
 class F1_score_new(Metric):
     def __init__(self, name='F1_score', **kwargs):
@@ -77,7 +78,7 @@ window_label_width = 1
 window_shift = 0
 epochs = 20
 losses = ['binary_crossentropy']
-metrics = [F1_score_new, 'precision', 'accuracy']
+metrics = [F1_score, 'precision', 'accuracy']
 
 # Get characteristic window
 characteristic_window = WindowGenerator(
@@ -96,14 +97,8 @@ for inputs, _ in characteristic_window.train.take(1):
     input_shape = inputs.shape[1:]
 
 lstm_model = tf.keras.Sequential([
-                            tf.keras.layers.LSTM(80, activation='tanh', input_shape=input_shape, return_sequences=True),
-                            tf.keras.layers.LSTM(128, activation='tanh', return_sequences=False),
-                            tf.keras.layers.Dense(80, activation='relu'),
-                            tf.keras.layers.Dense(64, activation='relu'),
-                            tf.keras.layers.Dense(32, activation='relu'),
-                            tf.keras.layers.Dropout(0.9),
-                            tf.keras.layers.Dense(10, activation='sigmoid'),
-                            tf.keras.layers.Dropout(0.9),
+                            tf.keras.layers.LSTM(80, activation='tanh', input_shape=input_shape),
+                            tf.keras.layers.Dropout(0.5),
                             tf.keras.layers.Dense(1, activation='sigmoid')
                             ])
 
@@ -117,6 +112,9 @@ for Id, group in all_train_data.groupby('Id'):
     print("!Len: ", len(train))
     print("!Events:", train['Event'].value_counts())
 
+    if len(train['Event'].unique()) == 1:
+        continue
+
     individual_window = WindowGenerator(
         input_width=window_input_width, label_width=window_label_width, shift=window_shift,
         train_df=train.drop(['Id'], axis=1),
@@ -127,8 +125,8 @@ for Id, group in all_train_data.groupby('Id'):
     lstm_model.fit(individual_window.train, epochs=epochs,
                    validation_data=individual_window.val)
 
-    lstm_model.evaluate(individual_window.test)
-    break
+
+lstm_model.save('test.keras')
 
 # Convert the model.
 run_model = tf.function(lambda x: lstm_model(x))

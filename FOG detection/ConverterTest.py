@@ -81,10 +81,10 @@ for Id, group in all_train_data.groupby('Id'):
                    validation_data=individual_window.val)
 
     lstm_model.evaluate(individual_window.test)
-    break
 
+return
 run_model = tf.function(lambda x: lstm_model(x))
-# This is important, let's fix the input size.
+# Это важно. Поправляем размерности
 BATCH_SIZE = 1
 STEPS = 10
 INPUT_SIZE = 5
@@ -102,6 +102,6 @@ converter.experimental_new_converter = True
 
 tflite_model = converter.convert()
 
-# Save the model.
-with open('SOOOOTEST.tflite', 'wb') as f:
+# Сохраняем конвертированную модель
+with open('lstm_model.tflite', 'wb') as f:
     f.write(tflite_model)
