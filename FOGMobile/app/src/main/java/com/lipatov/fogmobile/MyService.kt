@@ -62,27 +62,26 @@ class MyService: android.app.Service() {
         // Register Sensor
         sManager.registerListener(sListener, sensor, 100000)
 
-        // Stop collecting data after 1 second and process it
-        handler.postDelayed({
-            processSensorData()
-//            launchNewActivity() // Debug stuff
-            accelerometerData.clear()
-            timeStep = 0
-        }, 1000)
+        // Process data
+        val runnable = object : Runnable {
+            override fun run() {
+                println("Process Data")
+                processSensorData()
+                accelerometerData.clear()
+                timeStep = 0
+                handler.postDelayed(this, 2000) // Call this runnable again after 2 seconds
+            }
+        }
+
+        handler.post(runnable)
+
+        println("Data Processed")
 
         return START_STICKY
     }
 
     private fun processSensorData() {
         println("Processing data")
-
-//        val inputFeature0 = TensorBuffer.createFixedSize(intArrayOf(1, accelerometerData.size, 4), DataType.FLOAT32)
-//        val buffer = ByteBuffer.allocateDirect(accelerometerData.size * 4 * Float.SIZE_BYTES)  // 4 * number of floats in one entry (time + x + y + z)
-//        val floatBuffer = buffer.asFloatBuffer()
-//        accelerometerData.forEach { array ->
-//            floatBuffer.put(array)
-//        }
-//        floatBuffer.rewind()  // Rewind the buffer to be read from the beginning
 
         // Assuming lstmModel's input shape is [batch_size, 10, 5]
         val inputShape = intArrayOf(1, 10, 5)
