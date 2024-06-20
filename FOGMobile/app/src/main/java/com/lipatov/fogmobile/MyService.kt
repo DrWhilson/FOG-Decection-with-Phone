@@ -30,6 +30,16 @@ class MyService: android.app.Service() {
     // LSTM Model
     private lateinit var lstmModel: TestLstm
 
+    private val processDataRunnable = object : Runnable {
+        override fun run() {
+            println("Process Data")
+            processSensorData()
+            accelerometerData.clear()
+            timeStep = 0
+            handler.postDelayed(this, 2000) // Call this runnable again after 2 seconds
+        }
+    }
+
     // Listen a ACCELEROMETER
     val sListener = object : SensorEventListener {
         override fun onSensorChanged(event: SensorEvent?) {
@@ -62,18 +72,8 @@ class MyService: android.app.Service() {
         // Register Sensor
         sManager.registerListener(sListener, sensor, 100000)
 
-        // Process data
-        val runnable = object : Runnable {
-            override fun run() {
-                println("Process Data")
-                processSensorData()
-                accelerometerData.clear()
-                timeStep = 0
-                handler.postDelayed(this, 2000) // Call this runnable again after 2 seconds
-            }
-        }
-
-        handler.post(runnable)
+        // Start the Runnable for the first time
+        handler.post(processDataRunnable)
 
         println("Data Processed")
 
@@ -132,6 +132,7 @@ class MyService: android.app.Service() {
         println("Service off!")
         lstmModel.close()
         sManager.unregisterListener(sListener)
+        handler.removeCallbacks(processDataRunnable)
         super.onDestroy()
     }
 
