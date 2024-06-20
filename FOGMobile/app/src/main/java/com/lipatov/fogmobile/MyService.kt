@@ -23,7 +23,6 @@ import java.nio.ByteBuffer
 class MyService: android.app.Service() {
     private lateinit var sManager: SensorManager
 
-    //private lateinit var tflite: Interpreter
     private var accelerometerData = mutableListOf<FloatArray>()
     private lateinit var handler: Handler
     private var timeStep = 0
@@ -66,7 +65,7 @@ class MyService: android.app.Service() {
         // Stop collecting data after 1 second and process it
         handler.postDelayed({
             processSensorData()
-//            launchNewActivity()
+//            launchNewActivity() // Debug stuff
             accelerometerData.clear()
             timeStep = 0
         }, 1000)
@@ -77,34 +76,51 @@ class MyService: android.app.Service() {
     private fun processSensorData() {
         println("Processing data")
 
-       val inputFeature0 = TensorBuffer.createFixedSize(intArrayOf(1, accelerometerData.size, 4), DataType.FLOAT32)
+//        val inputFeature0 = TensorBuffer.createFixedSize(intArrayOf(1, accelerometerData.size, 4), DataType.FLOAT32)
+//        val buffer = ByteBuffer.allocateDirect(accelerometerData.size * 4 * Float.SIZE_BYTES)  // 4 * number of floats in one entry (time + x + y + z)
+//        val floatBuffer = buffer.asFloatBuffer()
+//        accelerometerData.forEach { array ->
+//            floatBuffer.put(array)
+//        }
+//        floatBuffer.rewind()  // Rewind the buffer to be read from the beginning
 
-        val buffer = ByteBuffer.allocateDirect(accelerometerData.size * 4 * Float.SIZE_BYTES)  // 4 * number of floats in one entry (time + x + y + z)
+        // Assuming lstmModel's input shape is [batch_size, 10, 5]
+        val inputShape = intArrayOf(1, 10, 5)
+        val inputFeature0 = TensorBuffer.createFixedSize(inputShape, DataType.FLOAT32)
+
+        // Allocate the buffer with the required size
+        val bufferSize = inputShape[1] * inputShape[2] * Float.SIZE_BYTES  // 10 * 5 * 4 bytes per float
+        val buffer = ByteBuffer.allocateDirect(bufferSize)
         val floatBuffer = buffer.asFloatBuffer()
-        accelerometerData.forEach { array ->
+
+        // Ensure accelerometerData has enough data to fill the buffer
+        // If not, you might need to handle the case where there is insufficient data
+        accelerometerData.take(inputShape[1]).forEach { array ->
             floatBuffer.put(array)
         }
+
         floatBuffer.rewind()  // Rewind the buffer to be read from the beginning
 
         inputFeature0.loadBuffer(buffer)
 
         // Process the data through the model
-         val outputs = lstmModel.process(inputFeature0)
-         val outputFeature0 = outputs.outputFeature0AsTensorBuffer
+        val outputs = lstmModel.process(inputFeature0)
+        val outputFeature0 = outputs.outputFeature0AsTensorBuffer
 
         if (checkForTrigger(outputFeature0)) {
             launchNewActivity()
         }
     }
 
-//    private fun checkForTrigger(outputFeature0: TensorBuffer): Boolean {
-//        for (i in 0 until outputFeature0.floatArray.size) {
-//            if (outputFeature0.floatArray[i] == 1f) {
-//                return true
-//            }
-//        }
-//        return false
-//    }
+    private fun checkForTrigger(outputFeature0: TensorBuffer): Boolean {
+        for (i in 0 until outputFeature0.floatArray.size) {
+            println("Get " + outputFeature0.floatArray[i] + " value")
+            if (outputFeature0.floatArray[i] > 0.5f) {
+                return true
+            }
+        }
+        return false
+    }
 
     private fun launchNewActivity() {
         val intent = Intent(this, AlertActivity::class.java)
